@@ -26,6 +26,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private readonly FacultyMemberSubjectService _assignmentService = new FacultyMemberSubjectService();
         private readonly ScheduleService _scheduleService = new ScheduleService();
         private readonly CurriculumImportService _curriculumImportService = new CurriculumImportService();
+        private readonly WeeklyScheduleImportService _weeklyScheduleImportService = new WeeklyScheduleImportService();
 
         private List<Branch> _branches = new List<Branch>();
         private List<StudyYear> _studyYears = new List<StudyYear>();
@@ -251,7 +252,11 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             var importButton = CreateActionButton("Import Curriculum", SuccessColor, (_, _) => ImportCurriculumFromPdf());
             importButton.Width = 170;
             importButton.Location = new Point(24, 88);
+            var importScheduleButton = CreateActionButton("Import Weekly Schedule", PrimaryColor, (_, _) => ImportWeeklyScheduleFromPdf());
+            importScheduleButton.Width = 190;
+            importScheduleButton.Location = new Point(210, 88);
             note.Controls.Add(importButton);
+            note.Controls.Add(importScheduleButton);
 
             content.Controls.Add(note);
             page.Controls.Add(content);
@@ -991,6 +996,31 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             }
         }
 
+        private void ImportWeeklyScheduleFromPdf()
+        {
+            DialogResult confirmation = MessageBox.Show(
+                "Import the weekly schedule extracted from the 2025-2026 second semester PDF?",
+                "Import Weekly Schedule",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (confirmation != DialogResult.Yes)
+            {
+                return;
+            }
+
+            try
+            {
+                WeeklyScheduleImportResult result = _weeklyScheduleImportService.ImportSecondSemester2026Schedule();
+                RefreshAllData();
+                ShowInfo(BuildWeeklyScheduleImportMessage(result));
+            }
+            catch (Exception ex)
+            {
+                ShowError(ex.Message);
+            }
+        }
+
         private void GenerateAutomaticSchedule()
         {
             DialogResult confirmation = MessageBox.Show(
@@ -1394,6 +1424,30 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 $"Subjects in PDF data: {result.TotalSubjectCount}",
                 $"Added subjects: {result.AddedSubjectCount}",
                 $"Updated subjects: {result.UpdatedSubjectCount}");
+        }
+
+        private static string BuildWeeklyScheduleImportMessage(WeeklyScheduleImportResult result)
+        {
+            var lines = new List<string>
+            {
+                $"Added schedule entries: {result.AddedScheduleCount}",
+                $"Already existing entries: {result.ExistingScheduleCount}",
+                $"Skipped conflicting entries: {result.SkippedScheduleCount}"
+            };
+
+            if (result.Warnings.Count > 0)
+            {
+                lines.Add(string.Empty);
+                lines.Add("Notes:");
+                lines.AddRange(result.Warnings.Take(8).Select(warning => "- " + warning));
+
+                if (result.Warnings.Count > 8)
+                {
+                    lines.Add($"- Plus {result.Warnings.Count - 8} more notes.");
+                }
+            }
+
+            return string.Join(Environment.NewLine, lines);
         }
 
         private static string BuildGenerationMessage(ScheduleGenerationResult result)
