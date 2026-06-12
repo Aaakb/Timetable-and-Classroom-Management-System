@@ -17,6 +17,15 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
             "Saturday"
         };
 
+        private static readonly string[] TeachingDays =
+        {
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday"
+        };
+
         public List<Schedule> GetAllSchedules()
         {
             using AppDbContext context = new AppDbContext();
@@ -29,7 +38,8 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
                 .Include(s => s.StudyYear)
                 .Include(s => s.Branch)
                 .Include(s => s.Section)
-                .OrderBy(s => s.DayOfWeek)
+                .ToList()
+                .OrderBy(s => GetDayOrder(s.DayOfWeek))
                 .ThenBy(s => s.TimeSlot.StartTime)
                 .ToList();
         }
@@ -129,6 +139,299 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
 
             context.Schedules.Remove(schedule);
             context.SaveChanges();
+        }
+
+        public ScheduleGenerationResult GenerateAutomaticSchedule(bool replaceExistingSchedules)
+        {
+            using AppDbContext context = new AppDbContext();
+
+            List<Subject> subjects = context.Subjects
+                .OrderBy(s => s.StudyYearID)
+                .ThenBy(s => s.BranchID)
+                .ThenBy(s => s.SubjectName)
+                .ToList();
+            List<Section> sections = context.Sections
+                .OrderBy(s => s.StudyYearID)
+                .ThenBy(s => s.BranchID)
+                .ThenBy(s => s.SectionName)
+                .ToList();
+            List<Classroom> classrooms = context.Classrooms
+                .OrderBy(c => c.Capacity)
+                .ThenBy(c => c.ClassroomNumber)
+                .ToList();
+            List<TimeSlot> timeSlots = context.TimeSlots
+                .Where(t => !t.IsBreak)
+                .OrderBy(t => t.StartTime)
+                .ToList();
+            List<FacultyMemberSubject> assignments = context.FacultyMemberSubjects
+                .ToList();
+
+            ValidateGenerationData(subjects, sections, classrooms, timeSlots, assignments);
+
+            using var transaction = context.Database.BeginTransaction();
+
+            if (replaceExistingSchedules)
+            {
+                context.Schedules.RemoveRange(context.Schedules);
+            }
+
+            List<Schedule> allSchedules = replaceExistingSchedules
+                ? new List<Schedule>()
+                : context.Schedules.AsNoTracking().ToList();
+
+            Dictionary<int, int> facultyLoad = BuildLoadMap(allSchedules, s => s.FacultyMemberID);
+            Dictionary<int, int> classroomLoad = BuildLoadMap(allSchedules, s => s.ClassroomID);
+
+            int createdCount = 0;
+            int skippedCount = 0;
+            List<string> warnings = new List<string>();
+
+            foreach (Section section in sections)
+            {
+                List<Subject> matchingSubjects = subjects
+                    .Where(subject => SubjectMatchesSection(subject, section))
+                    .ToList();
+
+                if (matchingSubjects.Count == 0)
+                {
+                    warnings.Add($"No subjects found for section {section.SectionName}.");
+                    continue;
+                }
+
+                foreach (Subject subject in matchingSubjects)
+                {
+                    int requiredSessions = GetRequiredSessionCount(subject);
+                    int alreadyScheduled = allSchedules.Count(s => s.SubjectID == subject.SubjectID && s.SectionID == section.SectionID);
+                    int remainingSessions = Math.Max(0, requiredSessions - alreadyScheduled);
+
+                    for (int sessionIndex = 0; sessionIndex < remainingSessions; sessionIndex++)
+                    {
+                        Schedule? schedule = CreateBestScheduleEntry(
+                            subject,
+                            section,
+                            classrooms,
+                            timeSlots,
+                            assignments,
+                            allSchedules,
+                            facultyLoad,
+                            classroomLoad);
+
+                        if (schedule == null)
+                        {
+                            skippedCount++;
+                            warnings.Add($"Could not place {subject.SubjectName} for section {section.SectionName}.");
+                            continue;
+                        }
+
+                        context.Schedules.Add(schedule);
+                        allSchedules.Add(schedule);
+                        IncreaseLoad(facultyLoad, schedule.FacultyMemberID);
+                        IncreaseLoad(classroomLoad, schedule.ClassroomID);
+
+                        createdCount++;
+                    }
+                }
+            }
+
+            context.SaveChanges();
+            transaction.Commit();
+
+            return new ScheduleGenerationResult(createdCount, skippedCount, warnings);
+        }
+
+        private static void ValidateGenerationData(
+            List<Subject> subjects,
+            List<Section> sections,
+            List<Classroom> classrooms,
+            List<TimeSlot> timeSlots,
+            List<FacultyMemberSubject> assignments)
+        {
+            if (sections.Count == 0)
+            {
+                throw new Exception("Add sections before generating a schedule.");
+            }
+
+            if (subjects.Count == 0)
+            {
+                throw new Exception("Add subjects before generating a schedule.");
+            }
+
+            if (classrooms.Count == 0)
+            {
+                throw new Exception("Add classrooms before generating a schedule.");
+            }
+
+            if (timeSlots.Count == 0)
+            {
+                throw new Exception("Add at least one non-break time slot before generating a schedule.");
+            }
+
+            if (assignments.Count == 0)
+            {
+                throw new Exception("Assign faculty members to subjects before generating a schedule.");
+            }
+        }
+
+        private static Schedule? CreateBestScheduleEntry(
+            Subject subject,
+            Section section,
+            List<Classroom> classrooms,
+            List<TimeSlot> timeSlots,
+            List<FacultyMemberSubject> assignments,
+            List<Schedule> allSchedules,
+            Dictionary<int, int> facultyLoad,
+            Dictionary<int, int> classroomLoad)
+        {
+            List<int> facultyIds = assignments
+                .Where(a => a.SubjectID == subject.SubjectID)
+                .Select(a => a.FacultyMemberID)
+                .Distinct()
+                .OrderBy(id => GetLoad(facultyLoad, id))
+                .ToList();
+
+            if (facultyIds.Count == 0)
+            {
+                return null;
+            }
+
+            List<Classroom> candidateClassrooms = classrooms
+                .Where(c => c.Capacity >= section.StudentCount)
+                .OrderBy(c => GetLoad(classroomLoad, c.ClassroomID))
+                .ThenBy(c => c.Capacity)
+                .ToList();
+
+            if (candidateClassrooms.Count == 0)
+            {
+                return null;
+            }
+
+            Schedule? schedule = TryCreateScheduleEntry(
+                subject,
+                section,
+                timeSlots,
+                facultyIds,
+                candidateClassrooms,
+                allSchedules,
+                facultyLoad,
+                classroomLoad,
+                avoidSameSubjectOnSameDay: true);
+
+            return schedule ?? TryCreateScheduleEntry(
+                subject,
+                section,
+                timeSlots,
+                facultyIds,
+                candidateClassrooms,
+                allSchedules,
+                facultyLoad,
+                classroomLoad,
+                avoidSameSubjectOnSameDay: false);
+        }
+
+        private static Schedule? TryCreateScheduleEntry(
+            Subject subject,
+            Section section,
+            List<TimeSlot> timeSlots,
+            List<int> facultyIds,
+            List<Classroom> classrooms,
+            List<Schedule> allSchedules,
+            Dictionary<int, int> facultyLoad,
+            Dictionary<int, int> classroomLoad,
+            bool avoidSameSubjectOnSameDay)
+        {
+            foreach (string day in TeachingDays.OrderBy(day => GetDaySectionLoad(allSchedules, section.SectionID, day)))
+            {
+                foreach (TimeSlot timeSlot in timeSlots)
+                {
+                    if (avoidSameSubjectOnSameDay && HasSameSubjectForSectionOnDay(allSchedules, subject.SubjectID, section.SectionID, day))
+                    {
+                        continue;
+                    }
+
+                    foreach (int facultyId in facultyIds.OrderBy(id => GetLoad(facultyLoad, id)))
+                    {
+                        foreach (Classroom classroom in classrooms.OrderBy(c => GetLoad(classroomLoad, c.ClassroomID)).ThenBy(c => c.Capacity))
+                        {
+                            if (HasSchedulingConflict(allSchedules, facultyId, classroom.ClassroomID, section.SectionID, timeSlot.TimeSlotID, day))
+                            {
+                                continue;
+                            }
+
+                            return new Schedule
+                            {
+                                SubjectID = subject.SubjectID,
+                                FacultyMemberID = facultyId,
+                                ClassroomID = classroom.ClassroomID,
+                                TimeSlotID = timeSlot.TimeSlotID,
+                                DayOfWeek = day,
+                                StudyYearID = section.StudyYearID,
+                                BranchID = section.BranchID,
+                                SectionID = section.SectionID
+                            };
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static bool SubjectMatchesSection(Subject subject, Section section)
+        {
+            return subject.StudyYearID == section.StudyYearID &&
+                (!subject.BranchID.HasValue || subject.BranchID == section.BranchID);
+        }
+
+        private static int GetRequiredSessionCount(Subject subject)
+        {
+            int totalHours = subject.TheoreticalHours + subject.PracticalHours;
+            return Math.Max(1, totalHours > 0 ? totalHours : subject.CreditUnits);
+        }
+
+        private static bool HasSchedulingConflict(
+            List<Schedule> schedules,
+            int facultyMemberId,
+            int classroomId,
+            int sectionId,
+            int timeSlotId,
+            string dayOfWeek)
+        {
+            return schedules.Any(s =>
+                s.DayOfWeek == dayOfWeek &&
+                s.TimeSlotID == timeSlotId &&
+                (s.FacultyMemberID == facultyMemberId ||
+                 s.ClassroomID == classroomId ||
+                 s.SectionID == sectionId));
+        }
+
+        private static bool HasSameSubjectForSectionOnDay(List<Schedule> schedules, int subjectId, int sectionId, string dayOfWeek)
+        {
+            return schedules.Any(s =>
+                s.DayOfWeek == dayOfWeek &&
+                s.SubjectID == subjectId &&
+                s.SectionID == sectionId);
+        }
+
+        private static int GetDaySectionLoad(List<Schedule> schedules, int sectionId, string dayOfWeek)
+        {
+            return schedules.Count(s => s.SectionID == sectionId && s.DayOfWeek == dayOfWeek);
+        }
+
+        private static Dictionary<int, int> BuildLoadMap(IEnumerable<Schedule> schedules, Func<Schedule, int> keySelector)
+        {
+            return schedules
+                .GroupBy(keySelector)
+                .ToDictionary(group => group.Key, group => group.Count());
+        }
+
+        private static int GetLoad(Dictionary<int, int> loadMap, int id)
+        {
+            return loadMap.TryGetValue(id, out int value) ? value : 0;
+        }
+
+        private static void IncreaseLoad(Dictionary<int, int> loadMap, int id)
+        {
+            loadMap[id] = GetLoad(loadMap, id) + 1;
         }
 
         private static string NormalizeDay(string dayOfWeek)
@@ -313,5 +616,38 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
                 }
             }
         }
+
+        private static int GetDayOrder(string dayOfWeek)
+        {
+            int index = Array.FindIndex(TeachingDays, day => day.Equals(dayOfWeek, StringComparison.OrdinalIgnoreCase));
+
+            if (index >= 0)
+            {
+                return index;
+            }
+
+            return dayOfWeek switch
+            {
+                "Friday" => 5,
+                "Saturday" => 6,
+                _ => 7
+            };
+        }
+    }
+
+    public sealed class ScheduleGenerationResult
+    {
+        public ScheduleGenerationResult(int createdCount, int skippedCount, IReadOnlyList<string> warnings)
+        {
+            CreatedCount = createdCount;
+            SkippedCount = skippedCount;
+            Warnings = warnings;
+        }
+
+        public int CreatedCount { get; }
+
+        public int SkippedCount { get; }
+
+        public IReadOnlyList<string> Warnings { get; }
     }
 }

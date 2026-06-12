@@ -482,6 +482,9 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             fields.Controls.Add(CreateField("Branch", cmbScheduleBranch));
             fields.Controls.Add(CreateField("Section", cmbScheduleSection));
 
+            var generateButton = CreateActionButton("Generate", HeaderColor, (_, _) => GenerateAutomaticSchedule());
+            generateButton.Width = 132;
+            buttons.Controls.Add(generateButton);
             buttons.Controls.Add(CreateActionButton("Add", SuccessColor, (_, _) =>
                 RunCommand(() => _scheduleService.AddSchedule(SelectedId(cmbScheduleSubject), SelectedId(cmbScheduleFaculty), SelectedId(cmbScheduleClassroom), SelectedId(cmbScheduleTimeSlot), cmbScheduleDay.Text, SelectedOptionalId(cmbScheduleYear), SelectedOptionalId(cmbScheduleBranch), SelectedOptionalId(cmbScheduleSection)), "Schedule entry added successfully.", ClearScheduleInputs)));
             buttons.Controls.Add(CreateActionButton("Update", PrimaryColor, (_, _) =>
@@ -958,6 +961,32 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             }
         }
 
+        private void GenerateAutomaticSchedule()
+        {
+            DialogResult confirmation = MessageBox.Show(
+                "Generate a new timetable and replace all existing schedule entries?",
+                "Generate Schedule",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (confirmation != DialogResult.Yes)
+            {
+                return;
+            }
+
+            try
+            {
+                ScheduleGenerationResult result = _scheduleService.GenerateAutomaticSchedule(replaceExistingSchedules: true);
+                RefreshAllData();
+                ClearScheduleInputs();
+                ShowInfo(BuildGenerationMessage(result));
+            }
+            catch (Exception ex)
+            {
+                ShowError(ex.Message);
+            }
+        }
+
         private void DgvBranches_CellClick(object? sender, DataGridViewCellEventArgs e)
         {
             if (!TryGetRow(dgvBranches, e.RowIndex, out DataGridViewRow row))
@@ -1324,6 +1353,33 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private static void ShowInfo(string message)
         {
             MessageBox.Show(message, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private static string BuildGenerationMessage(ScheduleGenerationResult result)
+        {
+            var lines = new List<string>
+            {
+                $"Generated {result.CreatedCount} schedule entries."
+            };
+
+            if (result.SkippedCount > 0)
+            {
+                lines.Add($"Skipped {result.SkippedCount} entries that could not fit.");
+            }
+
+            if (result.Warnings.Count > 0)
+            {
+                lines.Add(string.Empty);
+                lines.Add("Notes:");
+                lines.AddRange(result.Warnings.Take(8).Select(warning => "- " + warning));
+
+                if (result.Warnings.Count > 8)
+                {
+                    lines.Add($"- Plus {result.Warnings.Count - 8} more notes.");
+                }
+            }
+
+            return string.Join(Environment.NewLine, lines);
         }
 
         private static void ShowError(string message)
