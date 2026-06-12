@@ -482,6 +482,16 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
                 throw new Exception("Please select a time slot.");
             }
 
+            if (!studyYearId.HasValue || studyYearId.Value <= 0)
+            {
+                throw new Exception("Please select a study year.");
+            }
+
+            if (!sectionId.HasValue || sectionId.Value <= 0)
+            {
+                throw new Exception("Please select a section.");
+            }
+
             Subject? subject = context.Subjects
                 .FirstOrDefault(s => s.SubjectID == subjectId);
 
@@ -527,7 +537,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
                 throw new Exception("Selected faculty member is not assigned to teach this subject.");
             }
 
-            if (studyYearId.HasValue && !context.StudyYears.Any(y => y.StudyYearID == studyYearId.Value))
+            if (!context.StudyYears.Any(y => y.StudyYearID == studyYearId.Value))
             {
                 throw new Exception("Selected study year does not exist.");
             }
@@ -537,32 +547,32 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
                 throw new Exception("Selected branch does not exist.");
             }
 
-            Section? section = null;
+            Section? section = context.Sections
+                .FirstOrDefault(s => s.SectionID == sectionId.Value);
 
-            if (sectionId.HasValue)
+            if (section == null)
             {
-                section = context.Sections
-                    .FirstOrDefault(s => s.SectionID == sectionId.Value);
+                throw new Exception("Selected section does not exist.");
+            }
 
-                if (section == null)
-                {
-                    throw new Exception("Selected section does not exist.");
-                }
+            if (section.StudyYearID != studyYearId.Value)
+            {
+                throw new Exception("Selected section does not belong to the selected study year.");
+            }
 
-                if (studyYearId.HasValue && section.StudyYearID != studyYearId.Value)
-                {
-                    throw new Exception("Selected section does not belong to the selected study year.");
-                }
+            if (branchId.HasValue && section.BranchID != branchId.Value)
+            {
+                throw new Exception("Selected section does not belong to the selected branch.");
+            }
 
-                if (branchId.HasValue && section.BranchID != branchId.Value)
-                {
-                    throw new Exception("Selected section does not belong to the selected branch.");
-                }
+            if (!branchId.HasValue && section.BranchID.HasValue)
+            {
+                throw new Exception("Please select the branch that belongs to the selected section.");
+            }
 
-                if (section.StudentCount > classroom.Capacity)
-                {
-                    throw new Exception("Classroom capacity is less than the selected section student count.");
-                }
+            if (section.StudentCount > classroom.Capacity)
+            {
+                throw new Exception("Classroom capacity is less than the selected section student count.");
             }
 
             _ = dayOfWeek;

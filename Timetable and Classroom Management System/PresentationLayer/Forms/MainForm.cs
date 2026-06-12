@@ -520,7 +520,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             };
 
             root.RowStyles.Add(new RowStyle(SizeType.Absolute, 72));
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 170));
+            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 250));
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
             var heading = new Panel { Dock = DockStyle.Fill, BackColor = AppBackground };
@@ -552,7 +552,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             fields = new FlowLayoutPanel
             {
                 Dock = DockStyle.Top,
-                Height = 86,
+                Height = 164,
                 FlowDirection = FlowDirection.LeftToRight,
                 WrapContents = true,
                 BackColor = CardBackground
@@ -792,7 +792,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             }
             catch (Exception ex)
             {
-                ShowError("Could not load data. " + ex.Message);
+                ShowError(ex, "Could not load data.");
             }
         }
 
@@ -957,7 +957,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             }
             catch (Exception ex)
             {
-                ShowError(ex.Message);
+                ShowError(ex);
             }
         }
 
@@ -992,7 +992,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             }
             catch (Exception ex)
             {
-                ShowError(ex.Message);
+                ShowError(ex);
             }
         }
 
@@ -1017,7 +1017,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             }
             catch (Exception ex)
             {
-                ShowError(ex.Message);
+                ShowError(ex);
             }
         }
 
@@ -1043,7 +1043,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             }
             catch (Exception ex)
             {
-                ShowError(ex.Message);
+                ShowError(ex);
             }
         }
 
@@ -1477,9 +1477,35 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             return string.Join(Environment.NewLine, lines);
         }
 
-        private static void ShowError(string message)
+        private static void ShowError(Exception exception, string? prefix = null)
         {
-            MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(BuildErrorMessage(exception, prefix), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private static string BuildErrorMessage(Exception exception, string? prefix)
+        {
+            List<string> parts = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(prefix))
+            {
+                parts.Add(prefix);
+            }
+
+            parts.Add(exception.Message);
+
+            Exception? innerException = exception.InnerException;
+
+            while (innerException != null)
+            {
+                if (!string.IsNullOrWhiteSpace(innerException.Message))
+                {
+                    parts.Add(innerException.Message);
+                }
+
+                innerException = innerException.InnerException;
+            }
+
+            return string.Join(Environment.NewLine + Environment.NewLine, parts.Distinct());
         }
 
         private sealed class LookupItem
