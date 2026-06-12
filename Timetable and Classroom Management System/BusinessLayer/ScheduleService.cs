@@ -59,7 +59,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
             using AppDbContext context = new AppDbContext();
 
             ValidateScheduleInput(context, subjectId, facultyMemberId, classroomId, timeSlotId, dayOfWeek, studyYearId, branchId, sectionId);
-            EnsureNoScheduleConflicts(context, 0, facultyMemberId, classroomId, timeSlotId, dayOfWeek, sectionId);
+            EnsureNoScheduleConflicts(context, 0, facultyMemberId, classroomId, timeSlotId, dayOfWeek, studyYearId!.Value, branchId, sectionId);
 
             Schedule schedule = new Schedule
             {
@@ -106,7 +106,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
             }
 
             ValidateScheduleInput(context, subjectId, facultyMemberId, classroomId, timeSlotId, dayOfWeek, studyYearId, branchId, sectionId);
-            EnsureNoScheduleConflicts(context, scheduleId, facultyMemberId, classroomId, timeSlotId, dayOfWeek, sectionId);
+            EnsureNoScheduleConflicts(context, scheduleId, facultyMemberId, classroomId, timeSlotId, dayOfWeek, studyYearId!.Value, branchId, sectionId);
 
             schedule.SubjectID = subjectId;
             schedule.FacultyMemberID = facultyMemberId;
@@ -352,7 +352,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
                     {
                         foreach (Classroom classroom in classrooms.OrderBy(c => GetLoad(classroomLoad, c.ClassroomID)).ThenBy(c => c.Capacity))
                         {
-                            if (HasSchedulingConflict(allSchedules, facultyId, classroom.ClassroomID, section.SectionID, timeSlot.TimeSlotID, day))
+                            if (HasSchedulingConflict(allSchedules, facultyId, classroom.ClassroomID, section.SectionID, section.StudyYearID, section.BranchID, timeSlot.TimeSlotID, day))
                             {
                                 continue;
                             }
@@ -393,6 +393,8 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
             int facultyMemberId,
             int classroomId,
             int sectionId,
+            int studyYearId,
+            int? branchId,
             int timeSlotId,
             string dayOfWeek)
         {
@@ -401,6 +403,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
                 s.TimeSlotID == timeSlotId &&
                 (s.FacultyMemberID == facultyMemberId ||
                  s.ClassroomID == classroomId ||
+                 (s.StudyYearID == studyYearId && s.BranchID == branchId) ||
                  s.SectionID == sectionId));
         }
 
@@ -537,6 +540,16 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
                 throw new Exception("Selected faculty member is not assigned to teach this subject.");
             }
 
+            if (subject.StudyYearID != studyYearId.Value)
+            {
+                throw new Exception("Selected subject does not belong to the selected study year.");
+            }
+
+            if (subject.BranchID.HasValue && subject.BranchID != branchId)
+            {
+                throw new Exception("Selected subject belongs to a different branch.");
+            }
+
             if (!context.StudyYears.Any(y => y.StudyYearID == studyYearId.Value))
             {
                 throw new Exception("Selected study year does not exist.");
@@ -585,8 +598,23 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
             int classroomId,
             int timeSlotId,
             string dayOfWeek,
+            int studyYearId,
+            int? branchId,
             int? sectionId)
         {
+            bool yearBranchTimeConflict = context.Schedules
+                .Any(s =>
+                    s.ScheduleID != scheduleId &&
+                    s.DayOfWeek == dayOfWeek &&
+                    s.TimeSlotID == timeSlotId &&
+                    s.StudyYearID == studyYearId &&
+                    s.BranchID == branchId);
+
+            if (yearBranchTimeConflict)
+            {
+                throw new Exception("This study year and branch already have a class at this day and time. Choose another day/time or edit the existing schedule entry.");
+            }
+
             bool facultyConflict = context.Schedules
                 .Any(s =>
                     s.ScheduleID != scheduleId &&

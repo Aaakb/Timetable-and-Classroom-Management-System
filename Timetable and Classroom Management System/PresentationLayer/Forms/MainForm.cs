@@ -482,6 +482,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 "Saturday"
             });
             cmbScheduleDay.SelectedIndex = 0;
+            cmbScheduleSection.SelectedIndexChanged += (_, _) => SyncScheduleSectionContext();
 
             fields.Controls.Add(CreateField("Subject", cmbScheduleSubject));
             fields.Controls.Add(CreateField("Faculty", cmbScheduleFaculty));
@@ -828,9 +829,9 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             SetComboItems(cmbScheduleFaculty, _facultyMembers.Select(f => new LookupItem(f.FacultyMemberID, f.FullName)), false);
             SetComboItems(cmbScheduleClassroom, _classrooms.Select(c => new LookupItem(c.ClassroomID, $"{c.ClassroomNumber} ({c.Capacity})")), false);
             SetComboItems(cmbScheduleTimeSlot, _timeSlots.Select(t => new LookupItem(t.TimeSlotID, $"{FormatTime(t.StartTime)} - {FormatTime(t.EndTime)}{(t.IsBreak ? " Break" : string.Empty)}")), false);
-            SetComboItems(cmbScheduleYear, _studyYears.Select(y => new LookupItem(y.StudyYearID, y.YearName)), true);
+            SetComboItems(cmbScheduleYear, _studyYears.Select(y => new LookupItem(y.StudyYearID, y.YearName)), false);
             SetComboItems(cmbScheduleBranch, _branches.Select(b => new LookupItem(b.BranchID, b.BranchName)), true);
-            SetComboItems(cmbScheduleSection, _sections.Select(s => new LookupItem(s.SectionID, $"{s.SectionName} ({GetStudyYearName(s.StudyYearID)})")), true);
+            SetComboItems(cmbScheduleSection, _sections.Select(s => new LookupItem(s.SectionID, $"{s.SectionName} ({GetStudyYearName(s.StudyYearID)})")), false);
 
             if (cmbScheduleDay.Items.Count > 0 && cmbScheduleDay.SelectedIndex < 0)
             {
@@ -1254,10 +1255,24 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             {
                 cmbScheduleDay.SelectedIndex = 0;
             }
-            SetComboValue(cmbScheduleYear, 0);
+            SelectFirst(cmbScheduleYear);
             SetComboValue(cmbScheduleBranch, 0);
-            SetComboValue(cmbScheduleSection, 0);
+            SelectFirst(cmbScheduleSection);
             dgvSchedules.ClearSelection();
+        }
+
+        private void SyncScheduleSectionContext()
+        {
+            int sectionId = SelectedId(cmbScheduleSection);
+            Section? section = _sections.FirstOrDefault(s => s.SectionID == sectionId);
+
+            if (section == null)
+            {
+                return;
+            }
+
+            SetComboValue(cmbScheduleYear, section.StudyYearID);
+            SetComboValue(cmbScheduleBranch, section.BranchID ?? 0);
         }
 
         private string GetBranchName(int? branchId)
@@ -1311,9 +1326,9 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 source.Insert(0, new LookupItem(0, "None"));
             }
 
-            comboBox.DataSource = source;
             comboBox.DisplayMember = nameof(LookupItem.Name);
             comboBox.ValueMember = nameof(LookupItem.Id);
+            comboBox.DataSource = source;
 
             if (source.Count > 0)
             {
@@ -1503,6 +1518,11 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 }
 
                 innerException = innerException.InnerException;
+            }
+
+            if (parts.Any(part => part.Contains("UQ_Year_Branch_Time", StringComparison.OrdinalIgnoreCase)))
+            {
+                return "This study year and branch already have a class at this day and time. Choose another day/time or edit the existing schedule entry.";
             }
 
             return string.Join(Environment.NewLine + Environment.NewLine, parts.Distinct());
