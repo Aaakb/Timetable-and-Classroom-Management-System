@@ -25,6 +25,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private readonly TimeSlotService _timeSlotService = new TimeSlotService();
         private readonly FacultyMemberSubjectService _assignmentService = new FacultyMemberSubjectService();
         private readonly ScheduleService _scheduleService = new ScheduleService();
+        private readonly CurriculumImportService _curriculumImportService = new CurriculumImportService();
 
         private List<Branch> _branches = new List<Branch>();
         private List<StudyYear> _studyYears = new List<StudyYear>();
@@ -247,6 +248,10 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 ForeColor = MutedColor,
                 Location = new Point(24, 62)
             });
+            var importButton = CreateActionButton("Import Curriculum", SuccessColor, (_, _) => ImportCurriculumFromPdf());
+            importButton.Width = 170;
+            importButton.Location = new Point(24, 88);
+            note.Controls.Add(importButton);
 
             content.Controls.Add(note);
             page.Controls.Add(content);
@@ -961,6 +966,31 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             }
         }
 
+        private void ImportCurriculumFromPdf()
+        {
+            DialogResult confirmation = MessageBox.Show(
+                "Import the curriculum subjects extracted from the PDF?",
+                "Import Curriculum",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (confirmation != DialogResult.Yes)
+            {
+                return;
+            }
+
+            try
+            {
+                CurriculumImportResult result = _curriculumImportService.ImportComputerScienceCurriculum();
+                RefreshAllData();
+                ShowInfo(BuildCurriculumImportMessage(result));
+            }
+            catch (Exception ex)
+            {
+                ShowError(ex.Message);
+            }
+        }
+
         private void GenerateAutomaticSchedule()
         {
             DialogResult confirmation = MessageBox.Show(
@@ -1353,6 +1383,17 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private static void ShowInfo(string message)
         {
             MessageBox.Show(message, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private static string BuildCurriculumImportMessage(CurriculumImportResult result)
+        {
+            return string.Join(
+                Environment.NewLine,
+                $"Study years ready: {result.StudyYearCount}",
+                $"Branches ready: {result.BranchCount}",
+                $"Subjects in PDF data: {result.TotalSubjectCount}",
+                $"Added subjects: {result.AddedSubjectCount}",
+                $"Updated subjects: {result.UpdatedSubjectCount}");
         }
 
         private static string BuildGenerationMessage(ScheduleGenerationResult result)
