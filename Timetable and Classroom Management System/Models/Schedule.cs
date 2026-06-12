@@ -1,0 +1,46 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Timetable_and_Classroom_Management_System.Models
+{
+    public class Schedule
+    {
+        public int ScheduleID { get; set; }
+
+        public int SubjectID { get; set; }
+
+        public int FacultyMemberID { get; set; }
+
+        public int ClassroomID { get; set; }
+
+        public int TimeSlotID { get; set; }
+
+        public string DayOfWeek { get; set; } = string.Empty;
+
+        public int? StudyYearID { get; set; }
+
+        public int? BranchID { get; set; }
+
+        public int? SectionID { get; set; }
+
+
+        // Navigation Properties
+
+        public Subject Subject { get; set; } = null!;
+
+        public FacultyMember FacultyMember { get; set; } = null!;
+
+        public Classroom Classroom { get; set; } = null!;
+
+        public TimeSlot TimeSlot { get; set; } = null!;
+
+        public StudyYear? StudyYear { get; set; }
+
+        public Branch? Branch { get; set; }
+
+        public Section? Section { get; set; }
+    }
+}
