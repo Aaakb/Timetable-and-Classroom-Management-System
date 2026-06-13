@@ -306,8 +306,8 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         {
             var page = CreateDataPage("Study Years", "Create and update academic year levels.", out var fields, out var buttons, out dgvStudyYears);
 
-            txtStudyYearName = CreateTextBox("First year");
-            fields.Controls.Add(CreateField("Year name", txtStudyYearName));
+            txtStudyYearName = CreateTextBox("First Year");
+            fields.Controls.Add(CreateField("Study year name", txtStudyYearName));
 
             buttons.Controls.Add(CreateActionButton("Add", SuccessColor, (_, _) =>
                 RunCommand(() => _studyYearService.AddStudyYear(txtStudyYearName.Text), "Study year added successfully.", ClearStudyYearInputs)));
@@ -1349,6 +1349,8 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 grid.Columns["No"].MinimumWidth = 55;
             }
 
+            ApplyFriendlyColumnHeaders(grid);
+
             foreach (string columnName in hiddenColumns)
             {
                 if (grid.Columns.Contains(columnName))
@@ -1358,6 +1360,36 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             }
 
             ClearGridSelection(grid);
+        }
+
+        private static void ApplyFriendlyColumnHeaders(DataGridView grid)
+        {
+            SetHeader(grid, "BranchName", "Branch");
+            SetHeader(grid, "YearName", "Study Year");
+            SetHeader(grid, "ClassroomNumber", "Classroom");
+            SetHeader(grid, "RoomType", "Room Type");
+            SetHeader(grid, "FullName", "Full Name");
+            SetHeader(grid, "AcademicTitle", "Academic Title");
+            SetHeader(grid, "SubjectName", "Subject");
+            SetHeader(grid, "SemesterNumber", "Semester");
+            SetHeader(grid, "TheoreticalHours", "Theory Hours");
+            SetHeader(grid, "PracticalHours", "Practical Hours");
+            SetHeader(grid, "CreditUnits", "Credit Units");
+            SetHeader(grid, "RequirementType", "Requirement");
+            SetHeader(grid, "SectionName", "Section");
+            SetHeader(grid, "StudentCount", "Students");
+            SetHeader(grid, "StartTime", "Start Time");
+            SetHeader(grid, "EndTime", "End Time");
+            SetHeader(grid, "IsBreak", "Break");
+            SetHeader(grid, "DayOfWeek", "Day");
+        }
+
+        private static void SetHeader(DataGridView grid, string columnName, string headerText)
+        {
+            if (grid.Columns.Contains(columnName))
+            {
+                grid.Columns[columnName].HeaderText = headerText;
+            }
         }
 
         private static void ClearGridSelection(DataGridView grid)
