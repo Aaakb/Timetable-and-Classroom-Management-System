@@ -17,6 +17,9 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private void InitializeComponent()
         {
             SuspendLayout();
+            //
+            // MainForm
+            //
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1280, 820);
@@ -24,6 +27,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Timetable and Classroom Management System";
+            Load += MainForm_Load_1;
             ResumeLayout(false);
         }
     }
