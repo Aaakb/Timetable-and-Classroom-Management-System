@@ -58,16 +58,12 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private Guna2DataGridView dgvClassrooms = null!;
         private Guna2TextBox txtClassroomNumber = null!;
         private Guna2NumericUpDown numClassroomCapacity = null!;
-        private Guna2RadioButton rdoRoomLecture = null!;
-        private Guna2RadioButton rdoRoomLab = null!;
+        private Guna2ComboBox cmbRoomType = null!;
         private int selectedClassroomId;
 
         private Guna2DataGridView dgvFacultyMembers = null!;
         private Guna2TextBox txtFacultyName = null!;
-        private Guna2RadioButton rdoTitleProfessor = null!;
-        private Guna2RadioButton rdoTitleAssistantProfessor = null!;
-        private Guna2RadioButton rdoTitleLecturer = null!;
-        private Guna2RadioButton rdoTitleAssistantLecturer = null!;
+        private Guna2ComboBox cmbAcademicTitle = null!;
         private int selectedFacultyMemberId;
 
         private Guna2DataGridView dgvSubjects = null!;
@@ -76,6 +72,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private Guna2ComboBox cmbSubjectBranch = null!;
         private Guna2ComboBox cmbSubjectFilterYear = null!;
         private Guna2ComboBox cmbSubjectFilterBranch = null!;
+        private Guna2ComboBox cmbSubjectFilterSemester = null!;
         private Guna2NumericUpDown numSemester = null!;
         private Guna2NumericUpDown numTheoreticalHours = null!;
         private Guna2NumericUpDown numPracticalHours = null!;
@@ -333,11 +330,13 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
             txtClassroomNumber = CreateTextBox("A-101");
             numClassroomCapacity = CreateNumber(1, 1000, 30);
-            Control roomTypeSelector = CreateRoomTypeSelector();
+            cmbRoomType = CreateCombo();
+            cmbRoomType.Items.AddRange(new object[] { "Lecture", "Lab" });
+            cmbRoomType.SelectedIndex = 0;
 
             fields.Controls.Add(CreateField("Room number", txtClassroomNumber));
             fields.Controls.Add(CreateField("Capacity", numClassroomCapacity, 150));
-            fields.Controls.Add(CreateField("Room type", roomTypeSelector));
+            fields.Controls.Add(CreateField("Room type", cmbRoomType));
 
             buttons.Controls.Add(CreateActionButton("Add", SuccessColor, (_, _) =>
                 RunCommand(() => _classroomService.AddClassroom(txtClassroomNumber.Text, (int)numClassroomCapacity.Value, SelectedRoomType()), "Classroom added successfully.", ClearClassroomInputs)));
@@ -355,10 +354,12 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             var page = CreateDataPage("Faculty", "Manage instructors and academic titles.", out var fields, out var buttons, out dgvFacultyMembers);
 
             txtFacultyName = CreateTextBox("Dr. Sara Ahmed");
-            Control academicTitleSelector = CreateAcademicTitleSelector();
+            cmbAcademicTitle = CreateCombo();
+            cmbAcademicTitle.Items.AddRange(new object[] { "Professor", "Assistant Professor", "Lecturer", "Assistant Lecturer" });
+            cmbAcademicTitle.SelectedIndex = 1;
 
             fields.Controls.Add(CreateField("Full name", txtFacultyName));
-            fields.Controls.Add(CreateField("Academic title", academicTitleSelector, 420));
+            fields.Controls.Add(CreateField("Academic title", cmbAcademicTitle));
 
             buttons.Controls.Add(CreateActionButton("Add", SuccessColor, (_, _) =>
                 RunCommand(() => _facultyMemberService.AddFacultyMember(txtFacultyName.Text, SelectedAcademicTitle()), "Faculty member added successfully.", ClearFacultyInputs)));
@@ -384,6 +385,9 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             cmbSubjectFilterBranch = CreateCombo();
             cmbSubjectFilterBranch.Width = 170;
             cmbSubjectFilterBranch.Margin = new Padding(0, 6, 10, 0);
+            cmbSubjectFilterSemester = CreateCombo();
+            cmbSubjectFilterSemester.Width = 150;
+            cmbSubjectFilterSemester.Margin = new Padding(0, 6, 10, 0);
             numSemester = CreateNumber(1, 2, 1);
             numTheoreticalHours = CreateNumber(0, 20, 2);
             numPracticalHours = CreateNumber(0, 20, 0);
@@ -401,8 +405,10 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
             cmbSubjectFilterYear.SelectedIndexChanged += (_, _) => BindSubjectsGrid();
             cmbSubjectFilterBranch.SelectedIndexChanged += (_, _) => BindSubjectsGrid();
+            cmbSubjectFilterSemester.SelectedIndexChanged += (_, _) => BindSubjectsGrid();
             buttons.Controls.Add(cmbSubjectFilterYear);
             buttons.Controls.Add(cmbSubjectFilterBranch);
+            buttons.Controls.Add(cmbSubjectFilterSemester);
             buttons.Controls.Add(CreateActionButton("Add", SuccessColor, (_, _) =>
                 RunCommand(() => _subjectService.AddSubject(txtSubjectName.Text, SelectedId(cmbSubjectYear), (int)numSemester.Value, (int)numTheoreticalHours.Value, (int)numPracticalHours.Value, (int)numCreditUnits.Value, txtRequirementType.Text, SelectedOptionalId(cmbSubjectBranch)), "Subject added successfully.", ClearSubjectInputs)));
             buttons.Controls.Add(CreateActionButton("Update", PrimaryColor, (_, _) =>
@@ -781,84 +787,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             };
         }
 
-        private Control CreateRoomTypeSelector()
-        {
-            rdoRoomLecture = CreateRoomTypeRadio("Lecture", true);
-            rdoRoomLab = CreateRoomTypeRadio("Lab", false);
-
-            var panel = new FlowLayoutPanel
-            {
-                Width = 220,
-                Height = 40,
-                FlowDirection = FlowDirection.LeftToRight,
-                WrapContents = false,
-                BackColor = CardBackground,
-                Padding = new Padding(0)
-            };
-
-            panel.Controls.Add(rdoRoomLecture);
-            panel.Controls.Add(rdoRoomLab);
-            return panel;
-        }
-
-        private Guna2RadioButton CreateRoomTypeRadio(string text, bool isChecked)
-        {
-            return new Guna2RadioButton
-            {
-                Text = text,
-                Width = 96,
-                Height = 36,
-                Checked = isChecked,
-                Font = new Font("Segoe UI", 10F),
-                ForeColor = HeaderColor,
-                BackColor = Color.Transparent,
-                CheckedState = { FillColor = PrimaryColor, BorderColor = PrimaryColor },
-                UncheckedState = { FillColor = CardBackground, BorderColor = BorderColor },
-                Margin = new Padding(0, 2, 12, 0)
-            };
-        }
-
-        private Control CreateAcademicTitleSelector()
-        {
-            rdoTitleProfessor = CreateAcademicTitleRadio("Professor", false);
-            rdoTitleAssistantProfessor = CreateAcademicTitleRadio("Assistant Professor", true);
-            rdoTitleLecturer = CreateAcademicTitleRadio("Lecturer", false);
-            rdoTitleAssistantLecturer = CreateAcademicTitleRadio("Assistant Lecturer", false);
-
-            var panel = new FlowLayoutPanel
-            {
-                Width = 420,
-                Height = 40,
-                FlowDirection = FlowDirection.LeftToRight,
-                WrapContents = true,
-                BackColor = CardBackground,
-                Padding = new Padding(0)
-            };
-
-            panel.Controls.Add(rdoTitleProfessor);
-            panel.Controls.Add(rdoTitleAssistantProfessor);
-            panel.Controls.Add(rdoTitleLecturer);
-            panel.Controls.Add(rdoTitleAssistantLecturer);
-            return panel;
-        }
-
-        private Guna2RadioButton CreateAcademicTitleRadio(string text, bool isChecked)
-        {
-            return new Guna2RadioButton
-            {
-                Text = text,
-                Width = 180,
-                Height = 18,
-                Checked = isChecked,
-                Font = new Font("Segoe UI", 9F),
-                ForeColor = HeaderColor,
-                BackColor = Color.Transparent,
-                CheckedState = { FillColor = PrimaryColor, BorderColor = PrimaryColor },
-                UncheckedState = { FillColor = CardBackground, BorderColor = BorderColor },
-                Margin = new Padding(0, 0, 12, 2)
-            };
-        }
-
         private Control CreateField(string labelText, Control input, int width = 220)
         {
             input.Width = width;
@@ -946,6 +874,12 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             SetComboItems(cmbSubjectBranch, _branches.Select(b => new LookupItem(b.BranchID, b.BranchName)), true);
             SetComboItems(cmbSubjectFilterYear, _studyYears.Select(y => new LookupItem(y.StudyYearID, y.YearName)), true, "All study years");
             SetComboItems(cmbSubjectFilterBranch, _branches.Select(b => new LookupItem(b.BranchID, b.BranchName)), true, "All branches");
+            SetComboItems(cmbSubjectFilterSemester, new[]
+            {
+                new LookupItem(0, "All semesters"),
+                new LookupItem(1, "Semester 1"),
+                new LookupItem(2, "Semester 2")
+            }, false);
 
             SetComboItems(cmbSectionYear, _studyYears.Select(y => new LookupItem(y.StudyYearID, y.YearName)), false);
             SetComboItems(cmbSectionBranch, _branches.Select(b => new LookupItem(b.BranchID, b.BranchName)), true);
@@ -1059,6 +993,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         {
             int studyYearId = SelectedId(cmbSubjectFilterYear);
             int branchId = SelectedId(cmbSubjectFilterBranch);
+            int semesterNumber = SelectedId(cmbSubjectFilterSemester);
 
             IEnumerable<Subject> subjects = _subjects;
 
@@ -1070,6 +1005,11 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             if (branchId > 0)
             {
                 subjects = subjects.Where(s => s.BranchID == branchId);
+            }
+
+            if (semesterNumber > 0)
+            {
+                subjects = subjects.Where(s => s.SemesterNumber == semesterNumber);
             }
 
             dgvSubjects.DataSource = subjects
@@ -1465,47 +1405,60 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
         private string SelectedRoomType()
         {
-            return rdoRoomLab.Checked ? "Lab" : "Lecture";
+            string roomType = cmbRoomType.Text.Trim();
+            return string.IsNullOrWhiteSpace(roomType) ? "Lecture" : roomType;
         }
 
         private void SetSelectedRoomType(string? roomType)
         {
-            bool isLab = string.Equals(roomType?.Trim(), "Lab", StringComparison.OrdinalIgnoreCase);
-            rdoRoomLab.Checked = isLab;
-            rdoRoomLecture.Checked = !isLab;
+            string value = string.Equals(roomType?.Trim(), "Lab", StringComparison.OrdinalIgnoreCase)
+                ? "Lab"
+                : "Lecture";
+            cmbRoomType.SelectedItem = value;
+
+            if (cmbRoomType.SelectedIndex < 0)
+            {
+                cmbRoomType.SelectedIndex = 0;
+            }
         }
 
         private string SelectedAcademicTitle()
         {
-            if (rdoTitleProfessor.Checked)
+            string academicTitle = cmbAcademicTitle.Text.Trim();
+            return string.IsNullOrWhiteSpace(academicTitle) ? "Assistant Professor" : academicTitle;
+        }
+
+        private void SetSelectedAcademicTitle(string? academicTitle)
+        {
+            string title = NormalizeAcademicTitle(academicTitle);
+            cmbAcademicTitle.SelectedItem = title;
+
+            if (cmbAcademicTitle.SelectedIndex < 0)
+            {
+                cmbAcademicTitle.SelectedItem = "Assistant Professor";
+            }
+        }
+
+        private static string NormalizeAcademicTitle(string? academicTitle)
+        {
+            string title = academicTitle?.Trim() ?? string.Empty;
+
+            if (string.Equals(title, "Professor", StringComparison.OrdinalIgnoreCase))
             {
                 return "Professor";
             }
 
-            if (rdoTitleLecturer.Checked)
+            if (string.Equals(title, "Lecturer", StringComparison.OrdinalIgnoreCase))
             {
                 return "Lecturer";
             }
 
-            if (rdoTitleAssistantLecturer.Checked)
+            if (string.Equals(title, "Assistant Lecturer", StringComparison.OrdinalIgnoreCase))
             {
                 return "Assistant Lecturer";
             }
 
             return "Assistant Professor";
-        }
-
-        private void SetSelectedAcademicTitle(string? academicTitle)
-        {
-            string title = academicTitle?.Trim() ?? string.Empty;
-
-            rdoTitleProfessor.Checked = string.Equals(title, "Professor", StringComparison.OrdinalIgnoreCase);
-            rdoTitleLecturer.Checked = string.Equals(title, "Lecturer", StringComparison.OrdinalIgnoreCase);
-            rdoTitleAssistantLecturer.Checked = string.Equals(title, "Assistant Lecturer", StringComparison.OrdinalIgnoreCase);
-            rdoTitleAssistantProfessor.Checked =
-                string.IsNullOrWhiteSpace(title) ||
-                string.Equals(title, "Assistant Professor", StringComparison.OrdinalIgnoreCase) ||
-                (!rdoTitleProfessor.Checked && !rdoTitleLecturer.Checked && !rdoTitleAssistantLecturer.Checked);
         }
 
         private static string FormatTime(TimeSpan time)
