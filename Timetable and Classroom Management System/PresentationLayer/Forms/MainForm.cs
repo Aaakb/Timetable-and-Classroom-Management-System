@@ -1,7 +1,6 @@
 using System.Globalization;
 using Guna.UI2.WinForms;
 using Timetable_and_Classroom_Management_System.BusinessLayer;
-using Timetable_and_Classroom_Management_System.DataAccessLayer;
 using Timetable_and_Classroom_Management_System.Models;
 
 namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
@@ -261,7 +260,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
             note.Controls.Add(new Label
             {
-                Text = "Quick PDF imports",
+                Text = "System overview",
                 AutoSize = true,
                 Font = new Font("Segoe UI", 15F, FontStyle.Bold),
                 ForeColor = HeaderColor,
@@ -270,21 +269,15 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             });
             note.Controls.Add(new Label
             {
-                Text = "Use these buttons only when you want to load subjects or a weekly schedule from the prepared PDF files.",
-                AutoSize = true,
+                Text = "Use the sidebar to manage branches, study years, classrooms, faculty, subjects, sections, time slots, teaching assignments, and schedules. Conflict checks stay active while adding or updating schedule entries.",
+                AutoSize = false,
+                Width = 880,
+                Height = 48,
                 Font = new Font("Segoe UI", 10F),
                 ForeColor = MutedColor,
                 BackColor = Color.Transparent,
                 Location = new Point(24, 62)
             });
-            var importButton = CreateActionButton("Import Subjects PDF", SuccessColor, (_, _) => ImportCurriculumFromPdf());
-            importButton.Width = 175;
-            importButton.Location = new Point(24, 88);
-            var importScheduleButton = CreateActionButton("Import Schedule PDF", PrimaryColor, (_, _) => ImportWeeklyScheduleFromPdf());
-            importScheduleButton.Width = 178;
-            importScheduleButton.Location = new Point(214, 88);
-            note.Controls.Add(importButton);
-            note.Controls.Add(importScheduleButton);
 
             content.Controls.Add(note);
             page.Controls.Add(content);
@@ -1015,7 +1008,9 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         {
             int selectedStudyYearId = SelectedId(cmbScheduleFilterYear);
             List<Section> filterSections = _sections
-                .Where(s => IsFirstOrSecondStudyYear(s.StudyYearID))
+                .OrderBy(s => s.StudyYearID)
+                .ThenBy(s => s.BranchID ?? 0)
+                .ThenBy(s => s.SectionName)
                 .ToList();
 
             if (selectedStudyYearId > 0)
@@ -1025,23 +1020,10 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                     .ToList();
             }
 
-            bool canUseSectionFilter = selectedStudyYearId <= 0 || IsFirstOrSecondStudyYear(selectedStudyYearId);
-            string emptyLabel = canUseSectionFilter ? "All first/second sections" : "First/Second only";
+            string emptyLabel = selectedStudyYearId > 0 ? "All sections in year" : "All sections";
 
             SetComboItems(cmbScheduleFilterSection, filterSections.Select(s => new LookupItem(s.SectionID, FormatSectionDisplayName(s))), true, emptyLabel);
-            cmbScheduleFilterSection.Enabled = canUseSectionFilter;
-        }
-
-        private bool IsFirstOrSecondStudyYear(int studyYearId)
-        {
-            if (studyYearId <= 0)
-            {
-                return false;
-            }
-
-            string yearName = ReferenceNameNormalizer.NormalizeStudyYearName(GetStudyYearName(studyYearId));
-            return yearName == ReferenceNameNormalizer.FirstYear ||
-                yearName == ReferenceNameNormalizer.SecondYear;
+            cmbScheduleFilterSection.Enabled = true;
         }
 
         private void BindGrids()
