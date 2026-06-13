@@ -1,5 +1,4 @@
 using System.Globalization;
-using Timetable_and_Classroom_Management_System.DataAccessLayer;
 using Guna.UI2.WinForms;
 using Timetable_and_Classroom_Management_System.BusinessLayer;
 using Timetable_and_Classroom_Management_System.Models;
@@ -111,7 +110,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private Guna2ComboBox cmbScheduleFilterFaculty = null!;
         private Guna2ComboBox cmbScheduleFilterSection = null!;
         private Guna2ComboBox cmbScheduleFilterYear = null!;
-        private Guna2ComboBox cmbScheduleFilterBranch = null!;
         private Guna2ComboBox cmbScheduleFilterDay = null!;
         private int selectedScheduleId;
         private bool isClearingScheduleInputs;
@@ -262,7 +260,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
             note.Controls.Add(new Label
             {
-                Text = "Scheduling checks are active",
+                Text = "Quick PDF imports",
                 AutoSize = true,
                 Font = new Font("Segoe UI", 15F, FontStyle.Bold),
                 ForeColor = HeaderColor,
@@ -271,19 +269,19 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             });
             note.Controls.Add(new Label
             {
-                Text = "The app prevents faculty, classroom, and section conflicts in the same day and time slot.",
+                Text = "Use these buttons only when you want to load subjects or a weekly schedule from the prepared PDF files.",
                 AutoSize = true,
                 Font = new Font("Segoe UI", 10F),
                 ForeColor = MutedColor,
                 BackColor = Color.Transparent,
                 Location = new Point(24, 62)
             });
-            var importButton = CreateActionButton("Import Curriculum", SuccessColor, (_, _) => ImportCurriculumFromPdf());
-            importButton.Width = 170;
+            var importButton = CreateActionButton("Import Subjects PDF", SuccessColor, (_, _) => ImportCurriculumFromPdf());
+            importButton.Width = 175;
             importButton.Location = new Point(24, 88);
-            var importScheduleButton = CreateActionButton("Import Weekly Schedule", PrimaryColor, (_, _) => ImportWeeklyScheduleFromPdf());
-            importScheduleButton.Width = 190;
-            importScheduleButton.Location = new Point(210, 88);
+            var importScheduleButton = CreateActionButton("Import Schedule PDF", PrimaryColor, (_, _) => ImportWeeklyScheduleFromPdf());
+            importScheduleButton.Width = 178;
+            importScheduleButton.Location = new Point(214, 88);
             note.Controls.Add(importButton);
             note.Controls.Add(importScheduleButton);
 
@@ -518,7 +516,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             cmbScheduleFilterFaculty = CreateCombo();
             cmbScheduleFilterSection = CreateCombo();
             cmbScheduleFilterYear = CreateCombo();
-            cmbScheduleFilterBranch = CreateCombo();
             cmbScheduleFilterDay = CreateCombo();
 
             cmbScheduleDay.Items.AddRange(new object[]
@@ -548,12 +545,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             cmbScheduleFilterDay.SelectedIndex = 0;
             cmbScheduleFilterFaculty.SelectedIndexChanged += (_, _) => BindSchedulesGrid();
             cmbScheduleFilterSection.SelectedIndexChanged += (_, _) => BindSchedulesGrid();
-            cmbScheduleFilterYear.SelectedIndexChanged += (_, _) =>
-            {
-                RefreshScheduleFilterBranchOptions();
-                BindSchedulesGrid();
-            };
-            cmbScheduleFilterBranch.SelectedIndexChanged += (_, _) => BindSchedulesGrid();
+            cmbScheduleFilterYear.SelectedIndexChanged += (_, _) => BindSchedulesGrid();
             cmbScheduleFilterDay.SelectedIndexChanged += (_, _) => BindSchedulesGrid();
 
             fields.Controls.Add(CreateField("Subject", cmbScheduleSubject));
@@ -618,9 +610,8 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             };
 
             filters.Controls.Add(CreateField("Faculty filter", cmbScheduleFilterFaculty, 180));
-            filters.Controls.Add(CreateField("Section filter", cmbScheduleFilterSection, 160));
+            filters.Controls.Add(CreateField("Section filter", cmbScheduleFilterSection, 250));
             filters.Controls.Add(CreateField("Study year filter", cmbScheduleFilterYear, 170));
-            filters.Controls.Add(CreateField("Branch filter (3rd/4th)", cmbScheduleFilterBranch, 180));
             filters.Controls.Add(CreateField("Day filter", cmbScheduleFilterDay, 150));
 
             filterCard.Controls.Add(filters);
@@ -972,11 +963,10 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             SetComboItems(cmbScheduleTimeSlot, _timeSlots.Where(t => !t.IsBreak).Select(t => new LookupItem(t.TimeSlotID, $"{FormatTime(t.StartTime)} - {FormatTime(t.EndTime)}")), true, "Select time slot");
             SetComboItems(cmbScheduleYear, _studyYears.Select(y => new LookupItem(y.StudyYearID, y.YearName)), true, "Select study year");
             SetComboItems(cmbScheduleBranch, _branches.Select(b => new LookupItem(b.BranchID, b.BranchName)), true);
-            SetComboItems(cmbScheduleSection, _sections.Select(s => new LookupItem(s.SectionID, $"{s.SectionName} ({GetStudyYearName(s.StudyYearID)})")), true, "Select section");
+            SetComboItems(cmbScheduleSection, _sections.Select(s => new LookupItem(s.SectionID, FormatSectionDisplayName(s))), true, "Select section");
             SetComboItems(cmbScheduleFilterFaculty, _facultyMembers.Select(f => new LookupItem(f.FacultyMemberID, f.FullName)), true, "All faculty");
-            SetComboItems(cmbScheduleFilterSection, _sections.Select(s => new LookupItem(s.SectionID, $"{s.SectionName} ({GetStudyYearName(s.StudyYearID)})")), true, "All sections");
+            SetComboItems(cmbScheduleFilterSection, _sections.Select(s => new LookupItem(s.SectionID, FormatSectionDisplayName(s))), true, "All sections");
             SetComboItems(cmbScheduleFilterYear, _studyYears.Select(y => new LookupItem(y.StudyYearID, y.YearName)), true, "All study years");
-            RefreshScheduleFilterBranchOptions();
 
             if (cmbScheduleDay.Items.Count > 0 && cmbScheduleDay.SelectedIndex < 0)
             {
@@ -1014,31 +1004,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             return _branches
                 .Where(b => validBranchIds.Contains(b.BranchID))
                 .Select(b => new LookupItem(b.BranchID, b.BranchName));
-        }
-
-        private void RefreshScheduleFilterBranchOptions()
-        {
-            int studyYearId = SelectedId(cmbScheduleFilterYear);
-            bool canFilterByBranch = IsThirdOrFourthStudyYear(studyYearId);
-            IEnumerable<LookupItem> branchItems = canFilterByBranch
-                ? _branches.Select(b => new LookupItem(b.BranchID, b.BranchName))
-                : Enumerable.Empty<LookupItem>();
-
-            SetComboItems(cmbScheduleFilterBranch, branchItems, true, canFilterByBranch ? "All branches" : "Third/Fourth only");
-            cmbScheduleFilterBranch.Enabled = canFilterByBranch;
-        }
-
-        private bool IsThirdOrFourthStudyYear(int studyYearId)
-        {
-            if (studyYearId <= 0)
-            {
-                return false;
-            }
-
-            string yearName = GetStudyYearName(studyYearId);
-            string normalizedYearName = ReferenceNameNormalizer.NormalizeStudyYearName(yearName);
-            return normalizedYearName == ReferenceNameNormalizer.ThirdYear ||
-                normalizedYearName == ReferenceNameNormalizer.FourthYear;
         }
 
         private void BindGrids()
@@ -1146,7 +1111,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             int facultyId = SelectedId(cmbScheduleFilterFaculty);
             int sectionId = SelectedId(cmbScheduleFilterSection);
             int studyYearId = SelectedId(cmbScheduleFilterYear);
-            int branchId = SelectedId(cmbScheduleFilterBranch);
             string day = cmbScheduleFilterDay.Text.Trim();
 
             IEnumerable<Schedule> schedules = _schedules;
@@ -1164,11 +1128,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             if (studyYearId > 0)
             {
                 schedules = schedules.Where(s => s.StudyYearID == studyYearId);
-            }
-
-            if (branchId > 0)
-            {
-                schedules = schedules.Where(s => s.BranchID == branchId);
             }
 
             if (!string.IsNullOrWhiteSpace(day) && day != "All days")
@@ -1195,10 +1154,10 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                     s.BranchID,
                     Branch = s.Branch?.BranchName ?? "-",
                     s.SectionID,
-                    Section = s.Section?.SectionName ?? "-"
+                    Section = s.Section == null ? "-" : FormatSectionDisplayName(s.Section)
                 })
                 .ToList();
-            FinishGrid(dgvSchedules, "ScheduleID", "SubjectID", "FacultyMemberID", "ClassroomID", "TimeSlotID", "StudyYearID", "BranchID", "SectionID");
+            FinishGrid(dgvSchedules, "ScheduleID", "SubjectID", "FacultyMemberID", "ClassroomID", "TimeSlotID", "StudyYearID", "BranchID", "Branch", "SectionID");
         }
 
         private void BindSubjectsGrid()
@@ -1405,7 +1364,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                     GetGridText(row, "Faculty"),
                     GetGridText(row, "Classroom"),
                     GetGridText(row, "StudyYear"),
-                    GetGridText(row, "Branch"),
                     GetGridText(row, "Section")
                 });
             }
@@ -1419,7 +1377,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             AddSelectedFilter(filters, "Faculty", cmbScheduleFilterFaculty);
             AddSelectedFilter(filters, "Section", cmbScheduleFilterSection);
             AddSelectedFilter(filters, "Study Year", cmbScheduleFilterYear);
-            AddSelectedFilter(filters, "Branch", cmbScheduleFilterBranch);
 
             string day = cmbScheduleFilterDay.Text.Trim();
             if (!string.IsNullOrWhiteSpace(day) && day != "All days")
@@ -1651,6 +1608,11 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 SetComboValue(cmbScheduleYear, 0);
                 SetComboValue(cmbScheduleBranch, 0);
                 SetComboValue(cmbScheduleSection, 0);
+                SetComboValue(cmbScheduleFilterFaculty, 0);
+                SetComboValue(cmbScheduleFilterSection, 0);
+                SetComboValue(cmbScheduleFilterYear, 0);
+                cmbScheduleFilterDay.SelectedIndex = cmbScheduleFilterDay.Items.Count > 0 ? 0 : -1;
+                BindSchedulesGrid();
                 ClearGridSelection(dgvSchedules);
             }
             finally
@@ -1700,6 +1662,68 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private string GetStudyYearName(int studyYearId)
         {
             return _studyYears.FirstOrDefault(y => y.StudyYearID == studyYearId)?.YearName ?? "-";
+        }
+
+        private string FormatSectionDisplayName(Section section)
+        {
+            string yearName = GetStudyYearName(section.StudyYearID);
+            string branchName = GetBranchName(section.BranchID);
+            string sectionCode = section.SectionName.Trim();
+
+            sectionCode = RemoveDisplayPart(sectionCode, yearName);
+            sectionCode = RemoveDisplayPart(sectionCode, yearName.Replace(" Year", string.Empty, StringComparison.OrdinalIgnoreCase));
+
+            if (section.BranchID.HasValue)
+            {
+                sectionCode = RemoveDisplayPart(sectionCode, branchName);
+                sectionCode = RemoveDisplayPart(sectionCode, CompactBranchName(branchName));
+            }
+
+            sectionCode = NormalizeDisplayText(sectionCode.Trim('-', ' ', '/', '\\', '|'));
+
+            if (string.IsNullOrWhiteSpace(sectionCode))
+            {
+                sectionCode = section.SectionName.Trim();
+            }
+
+            if (section.BranchID.HasValue)
+            {
+                return $"{yearName} - {CompactBranchName(branchName)} - {sectionCode}";
+            }
+
+            return $"{yearName} - {sectionCode}";
+        }
+
+        private static string CompactBranchName(string branchName)
+        {
+            return branchName switch
+            {
+                "Computer Science" => "CS",
+                "Cyber Security" => "Cyber",
+                "Information Technology" => "IT",
+                _ => branchName
+            };
+        }
+
+        private static string RemoveDisplayPart(string value, string part)
+        {
+            if (string.IsNullOrWhiteSpace(value) || string.IsNullOrWhiteSpace(part))
+            {
+                return value;
+            }
+
+            int index;
+            while ((index = value.IndexOf(part, StringComparison.OrdinalIgnoreCase)) >= 0)
+            {
+                value = value.Remove(index, part.Length);
+            }
+
+            return value;
+        }
+
+        private static string NormalizeDisplayText(string value)
+        {
+            return string.Join(" ", value.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries));
         }
 
         private string SelectedRoomType()

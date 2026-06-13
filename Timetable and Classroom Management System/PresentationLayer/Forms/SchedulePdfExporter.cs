@@ -13,20 +13,18 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             "Faculty",
             "Room",
             "Study Year",
-            "Branch",
             "Section"
         };
 
         private static readonly float[] ColumnWidths =
         {
-            70,
-            88,
-            150,
-            118,
+            64,
+            82,
+            205,
+            132,
             58,
-            90,
-            110,
-            66
+            92,
+            145
         };
 
         public static void Export(string filePath, string title, IReadOnlyList<string[]> rows)
@@ -35,10 +33,10 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             const float pageHeight = 595;
             const float margin = 32;
             const float titleY = 560;
-            const float tableTop = 524;
-            const float headerHeight = 22;
-            const float rowHeight = 20;
-            const int rowsPerPage = 23;
+            const float tableTop = 516;
+            const float headerHeight = 26;
+            const float rowHeight = 24;
+            const int rowsPerPage = 19;
 
             var pdf = new SimplePdfDocument(pageWidth, pageHeight);
 
@@ -50,12 +48,12 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                     .ToList();
 
                 var content = new StringBuilder();
-                AddText(content, margin, titleY, 15, title, bold: true);
+                AddText(content, margin, titleY, 17, title, bold: true);
                 AddText(
                     content,
-                    margin,
-                    titleY - 18,
-                    8,
+                    margin + 2,
+                    titleY - 21,
+                    8.5f,
                     $"Generated: {DateTime.Now:yyyy-MM-dd HH:mm}    Page {(pageStart / rowsPerPage) + 1} of {Math.Ceiling(rows.Count / (double)rowsPerPage).ToString(CultureInfo.InvariantCulture)}",
                     bold: false);
 
@@ -77,7 +75,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             float currentX = x;
             for (int i = 0; i < Headers.Length; i++)
             {
-                AddText(content, currentX + 4, y - 15, 8, Headers[i], bold: true, white: true);
+                AddText(content, currentX + 5, y - 17, 8.5f, Headers[i], bold: true, white: true);
                 currentX += ColumnWidths[i];
             }
 
@@ -101,8 +99,8 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 for (int columnIndex = 0; columnIndex < Headers.Length; columnIndex++)
                 {
                     string value = columnIndex < row.Length ? row[columnIndex] : string.Empty;
-                    int maxCharacters = Math.Max(6, (int)(ColumnWidths[columnIndex] / 5.1f));
-                    AddText(content, currentX + 4, rowY + 6, 7.5f, Truncate(value, maxCharacters), bold: false);
+                    int maxCharacters = Math.Max(6, (int)(ColumnWidths[columnIndex] / 4.7f));
+                    AddText(content, currentX + 5, rowY + 8, 8.2f, Truncate(value, maxCharacters), bold: false);
                     currentX += ColumnWidths[columnIndex];
                 }
             }
