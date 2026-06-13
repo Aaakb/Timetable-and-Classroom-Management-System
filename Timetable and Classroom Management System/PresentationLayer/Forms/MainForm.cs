@@ -858,13 +858,13 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             SetComboItems(cmbAssignFaculty, _facultyMembers.Select(f => new LookupItem(f.FacultyMemberID, f.FullName)), false);
             SetComboItems(cmbAssignSubject, _subjects.Select(s => new LookupItem(s.SubjectID, s.SubjectName)), false);
 
-            SetComboItems(cmbScheduleSubject, _subjects.Select(s => new LookupItem(s.SubjectID, s.SubjectName)), false);
-            SetComboItems(cmbScheduleFaculty, _facultyMembers.Select(f => new LookupItem(f.FacultyMemberID, f.FullName)), false);
-            SetComboItems(cmbScheduleClassroom, _classrooms.Select(c => new LookupItem(c.ClassroomID, $"{c.ClassroomNumber} ({c.Capacity})")), false);
-            SetComboItems(cmbScheduleTimeSlot, _timeSlots.Select(t => new LookupItem(t.TimeSlotID, $"{FormatTime(t.StartTime)} - {FormatTime(t.EndTime)}{(t.IsBreak ? " Break" : string.Empty)}")), false);
-            SetComboItems(cmbScheduleYear, _studyYears.Select(y => new LookupItem(y.StudyYearID, y.YearName)), false);
+            SetComboItems(cmbScheduleSubject, _subjects.Select(s => new LookupItem(s.SubjectID, s.SubjectName)), true, "Select subject");
+            SetComboItems(cmbScheduleFaculty, _facultyMembers.Select(f => new LookupItem(f.FacultyMemberID, f.FullName)), true, "Select faculty");
+            SetComboItems(cmbScheduleClassroom, _classrooms.Select(c => new LookupItem(c.ClassroomID, $"{c.ClassroomNumber} ({c.Capacity})")), true, "Select classroom");
+            SetComboItems(cmbScheduleTimeSlot, _timeSlots.Select(t => new LookupItem(t.TimeSlotID, $"{FormatTime(t.StartTime)} - {FormatTime(t.EndTime)}{(t.IsBreak ? " Break" : string.Empty)}")), true, "Select time slot");
+            SetComboItems(cmbScheduleYear, _studyYears.Select(y => new LookupItem(y.StudyYearID, y.YearName)), true, "Select study year");
             SetComboItems(cmbScheduleBranch, _branches.Select(b => new LookupItem(b.BranchID, b.BranchName)), true);
-            SetComboItems(cmbScheduleSection, _sections.Select(s => new LookupItem(s.SectionID, $"{s.SectionName} ({GetStudyYearName(s.StudyYearID)})")), false);
+            SetComboItems(cmbScheduleSection, _sections.Select(s => new LookupItem(s.SectionID, $"{s.SectionName} ({GetStudyYearName(s.StudyYearID)})")), true, "Select section");
 
             if (cmbScheduleDay.Items.Count > 0 && cmbScheduleDay.SelectedIndex < 0)
             {
@@ -875,28 +875,29 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private void BindGrids()
         {
             dgvBranches.DataSource = _branches
-                .Select(b => new { b.BranchID, b.BranchName })
+                .Select((b, index) => new { No = index + 1, b.BranchID, b.BranchName })
                 .ToList();
-            FinishGrid(dgvBranches);
+            FinishGrid(dgvBranches, "BranchID");
 
             dgvStudyYears.DataSource = _studyYears
-                .Select(y => new { y.StudyYearID, y.YearName })
+                .Select((y, index) => new { No = index + 1, y.StudyYearID, y.YearName })
                 .ToList();
-            FinishGrid(dgvStudyYears);
+            FinishGrid(dgvStudyYears, "StudyYearID");
 
             dgvClassrooms.DataSource = _classrooms
-                .Select(c => new { c.ClassroomID, c.ClassroomNumber, c.Capacity, c.RoomType })
+                .Select((c, index) => new { No = index + 1, c.ClassroomID, c.ClassroomNumber, c.Capacity, c.RoomType })
                 .ToList();
-            FinishGrid(dgvClassrooms);
+            FinishGrid(dgvClassrooms, "ClassroomID");
 
             dgvFacultyMembers.DataSource = _facultyMembers
-                .Select(f => new { f.FacultyMemberID, f.FullName, f.AcademicTitle })
+                .Select((f, index) => new { No = index + 1, f.FacultyMemberID, f.FullName, f.AcademicTitle })
                 .ToList();
-            FinishGrid(dgvFacultyMembers);
+            FinishGrid(dgvFacultyMembers, "FacultyMemberID");
 
             dgvSubjects.DataSource = _subjects
-                .Select(s => new
+                .Select((s, index) => new
                 {
+                    No = index + 1,
                     s.SubjectID,
                     s.SubjectName,
                     s.StudyYearID,
@@ -910,11 +911,12 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                     Branch = GetBranchName(s.BranchID)
                 })
                 .ToList();
-            FinishGrid(dgvSubjects, "StudyYearID", "BranchID");
+            FinishGrid(dgvSubjects, "SubjectID", "StudyYearID", "BranchID");
 
             dgvSections.DataSource = _sections
-                .Select(s => new
+                .Select((s, index) => new
                 {
+                    No = index + 1,
                     s.SectionID,
                     s.SectionName,
                     s.StudentCount,
@@ -924,22 +926,24 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                     Branch = GetBranchName(s.BranchID)
                 })
                 .ToList();
-            FinishGrid(dgvSections, "StudyYearID", "BranchID");
+            FinishGrid(dgvSections, "SectionID", "StudyYearID", "BranchID");
 
             dgvTimeSlots.DataSource = _timeSlots
-                .Select(t => new
+                .Select((t, index) => new
                 {
+                    No = index + 1,
                     t.TimeSlotID,
                     StartTime = FormatTime(t.StartTime),
                     EndTime = FormatTime(t.EndTime),
                     t.IsBreak
                 })
                 .ToList();
-            FinishGrid(dgvTimeSlots);
+            FinishGrid(dgvTimeSlots, "TimeSlotID");
 
             dgvAssignments.DataSource = _assignments
-                .Select(a => new
+                .Select((a, index) => new
                 {
+                    No = index + 1,
                     a.FacultyMemberID,
                     FacultyMember = a.FacultyMember.FullName,
                     a.SubjectID,
@@ -949,8 +953,9 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             FinishGrid(dgvAssignments, "FacultyMemberID", "SubjectID");
 
             dgvSchedules.DataSource = _schedules
-                .Select(s => new
+                .Select((s, index) => new
                 {
+                    No = index + 1,
                     s.ScheduleID,
                     s.DayOfWeek,
                     Time = $"{FormatTime(s.TimeSlot.StartTime)} - {FormatTime(s.TimeSlot.EndTime)}",
@@ -969,7 +974,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                     Section = s.Section?.SectionName ?? "-"
                 })
                 .ToList();
-            FinishGrid(dgvSchedules, "SubjectID", "FacultyMemberID", "ClassroomID", "TimeSlotID", "StudyYearID", "BranchID", "SectionID");
+            FinishGrid(dgvSchedules, "ScheduleID", "SubjectID", "FacultyMemberID", "ClassroomID", "TimeSlotID", "StudyYearID", "BranchID", "SectionID");
         }
 
         private void UpdateDashboard()
@@ -1280,18 +1285,15 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private void ClearScheduleInputs()
         {
             selectedScheduleId = 0;
-            SelectFirst(cmbScheduleSubject);
-            SelectFirst(cmbScheduleFaculty);
-            SelectFirst(cmbScheduleClassroom);
-            SelectFirst(cmbScheduleTimeSlot);
-            if (cmbScheduleDay.Items.Count > 0)
-            {
-                cmbScheduleDay.SelectedIndex = 0;
-            }
-            SelectFirst(cmbScheduleYear);
+            SetComboValue(cmbScheduleSubject, 0);
+            SetComboValue(cmbScheduleFaculty, 0);
+            SetComboValue(cmbScheduleClassroom, 0);
+            SetComboValue(cmbScheduleTimeSlot, 0);
+            cmbScheduleDay.SelectedIndex = -1;
+            SetComboValue(cmbScheduleYear, 0);
             SetComboValue(cmbScheduleBranch, 0);
-            SelectFirst(cmbScheduleSection);
-            dgvSchedules.ClearSelection();
+            SetComboValue(cmbScheduleSection, 0);
+            ClearGridSelection(dgvSchedules);
         }
 
         private void SyncScheduleSectionContext()
@@ -1339,6 +1341,14 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
         private static void FinishGrid(DataGridView grid, params string[] hiddenColumns)
         {
+            if (grid.Columns.Contains("No"))
+            {
+                grid.Columns["No"].HeaderText = "ID";
+                grid.Columns["No"].DisplayIndex = 0;
+                grid.Columns["No"].FillWeight = 45;
+                grid.Columns["No"].MinimumWidth = 55;
+            }
+
             foreach (string columnName in hiddenColumns)
             {
                 if (grid.Columns.Contains(columnName))
@@ -1347,16 +1357,30 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 }
             }
 
-            grid.ClearSelection();
+            ClearGridSelection(grid);
         }
 
-        private static void SetComboItems(Guna2ComboBox comboBox, IEnumerable<LookupItem> items, bool includeEmpty)
+        private static void ClearGridSelection(DataGridView grid)
+        {
+            grid.ClearSelection();
+
+            try
+            {
+                grid.CurrentCell = null;
+            }
+            catch
+            {
+                // Some grid states briefly reject clearing CurrentCell during rebinding.
+            }
+        }
+
+        private static void SetComboItems(Guna2ComboBox comboBox, IEnumerable<LookupItem> items, bool includeEmpty, string emptyLabel = "None")
         {
             var source = items.ToList();
 
             if (includeEmpty)
             {
-                source.Insert(0, new LookupItem(0, "None"));
+                source.Insert(0, new LookupItem(0, emptyLabel));
             }
 
             comboBox.DisplayMember = nameof(LookupItem.Name);
