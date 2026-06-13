@@ -9,8 +9,11 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
     {
         private static readonly Color AppBackground = Color.FromArgb(245, 247, 251);
         private static readonly Color CardBackground = Color.White;
+        private static readonly Color SurfaceColor = Color.FromArgb(248, 250, 252);
         private static readonly Color BorderColor = Color.FromArgb(226, 232, 240);
         private static readonly Color HeaderColor = Color.FromArgb(15, 23, 42);
+        private static readonly Color SidebarColor = Color.FromArgb(30, 41, 59);
+        private static readonly Color SidebarHoverColor = Color.FromArgb(51, 65, 85);
         private static readonly Color PrimaryColor = Color.FromArgb(37, 99, 235);
         private static readonly Color SuccessColor = Color.FromArgb(16, 185, 129);
         private static readonly Color DangerColor = Color.FromArgb(239, 68, 68);
@@ -141,8 +144,18 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 Font = new Font("Segoe UI", 10F, FontStyle.Bold),
                 ItemSize = new Size(150, 42),
                 SizeMode = TabSizeMode.Fixed,
-                Padding = new Point(12, 4)
+                Padding = new Point(12, 4),
+                TabMenuBackColor = SidebarColor
             };
+            tabs.TabButtonIdleState.FillColor = SidebarColor;
+            tabs.TabButtonIdleState.ForeColor = Color.FromArgb(203, 213, 225);
+            tabs.TabButtonIdleState.InnerColor = SidebarColor;
+            tabs.TabButtonHoverState.FillColor = SidebarHoverColor;
+            tabs.TabButtonHoverState.ForeColor = Color.White;
+            tabs.TabButtonHoverState.InnerColor = PrimaryColor;
+            tabs.TabButtonSelectedState.FillColor = HeaderColor;
+            tabs.TabButtonSelectedState.ForeColor = Color.White;
+            tabs.TabButtonSelectedState.InnerColor = PrimaryColor;
 
             tabs.Controls.Add(CreateDashboardPage());
             tabs.Controls.Add(CreateBranchesPage());
@@ -165,7 +178,9 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             {
                 Dock = DockStyle.Fill,
                 BorderRadius = 14,
-                FillColor = HeaderColor,
+                FillColor = CardBackground,
+                BorderColor = BorderColor,
+                BorderThickness = 1,
                 Padding = new Padding(24, 14, 24, 14)
             };
 
@@ -174,7 +189,8 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 Text = "Timetable Studio",
                 AutoSize = true,
                 Font = new Font("Segoe UI", 22F, FontStyle.Bold),
-                ForeColor = Color.White,
+                ForeColor = HeaderColor,
+                BackColor = Color.Transparent,
                 Location = new Point(24, 14)
             };
 
@@ -183,7 +199,8 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 Text = "Modern classroom, subject, faculty, and schedule management",
                 AutoSize = true,
                 Font = new Font("Segoe UI", 10F),
-                ForeColor = Color.FromArgb(203, 213, 225),
+                ForeColor = MutedColor,
+                BackColor = Color.Transparent,
                 Location = new Point(28, 56)
             };
 
@@ -240,6 +257,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 AutoSize = true,
                 Font = new Font("Segoe UI", 15F, FontStyle.Bold),
                 ForeColor = HeaderColor,
+                BackColor = Color.Transparent,
                 Location = new Point(22, 20)
             });
             note.Controls.Add(new Label
@@ -248,6 +266,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 AutoSize = true,
                 Font = new Font("Segoe UI", 10F),
                 ForeColor = MutedColor,
+                BackColor = Color.Transparent,
                 Location = new Point(24, 62)
             });
             var importButton = CreateActionButton("Import Curriculum", SuccessColor, (_, _) => ImportCurriculumFromPdf());
@@ -420,6 +439,9 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 AutoSize = true,
                 Font = new Font("Segoe UI", 10F),
                 ForeColor = HeaderColor,
+                BackColor = Color.Transparent,
+                CheckedState = { FillColor = PrimaryColor, BorderColor = PrimaryColor },
+                UncheckedState = { FillColor = CardBackground, BorderColor = BorderColor },
                 Margin = new Padding(0, 27, 16, 8)
             };
 
@@ -532,6 +554,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 AutoSize = true,
                 Font = new Font("Segoe UI", 20F, FontStyle.Bold),
                 ForeColor = HeaderColor,
+                BackColor = Color.Transparent,
                 Location = new Point(0, 4)
             });
             heading.Controls.Add(new Label
@@ -540,6 +563,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 AutoSize = true,
                 Font = new Font("Segoe UI", 10F),
                 ForeColor = MutedColor,
+                BackColor = Color.Transparent,
                 Location = new Point(2, 46)
             });
 
@@ -610,6 +634,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 AutoSize = true,
                 Font = new Font("Segoe UI", 10F, FontStyle.Bold),
                 ForeColor = MutedColor,
+                BackColor = Color.Transparent,
                 Location = new Point(18, 18)
             };
 
@@ -623,6 +648,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 Height = 40,
                 Font = new Font("Segoe UI", 9F),
                 ForeColor = MutedColor,
+                BackColor = Color.Transparent,
                 Location = new Point(18, 94)
             };
 
@@ -639,7 +665,8 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 Text = "0",
                 AutoSize = true,
                 Font = new Font("Segoe UI", 26F, FontStyle.Bold),
-                ForeColor = HeaderColor
+                ForeColor = HeaderColor,
+                BackColor = Color.Transparent
             };
         }
 
@@ -668,10 +695,10 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
             grid.ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
             {
-                BackColor = HeaderColor,
+                BackColor = PrimaryColor,
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-                SelectionBackColor = HeaderColor,
+                SelectionBackColor = PrimaryColor,
                 SelectionForeColor = Color.White
             };
             grid.DefaultCellStyle = new DataGridViewCellStyle
@@ -684,7 +711,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             };
             grid.AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
             {
-                BackColor = Color.FromArgb(248, 250, 252)
+                BackColor = SurfaceColor
             };
             grid.RowTemplate.Height = 38;
 
@@ -700,7 +727,9 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 BorderRadius = 8,
                 BorderColor = BorderColor,
                 FillColor = CardBackground,
+                ForeColor = HeaderColor,
                 Font = new Font("Segoe UI", 10F),
+                PlaceholderForeColor = Color.FromArgb(148, 163, 184),
                 PlaceholderText = placeholder
             };
         }
@@ -715,6 +744,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 BorderColor = BorderColor,
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 FillColor = CardBackground,
+                ForeColor = HeaderColor,
                 Font = new Font("Segoe UI", 10F)
             };
         }
@@ -728,6 +758,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 BorderRadius = 8,
                 BorderColor = BorderColor,
                 FillColor = CardBackground,
+                ForeColor = HeaderColor,
                 Font = new Font("Segoe UI", 10F),
                 Minimum = minimum,
                 Maximum = maximum,
@@ -757,6 +788,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 Height = 24,
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold),
                 ForeColor = HeaderColor,
+                BackColor = Color.Transparent,
                 Location = new Point(0, 0)
             });
             panel.Controls.Add(input);
