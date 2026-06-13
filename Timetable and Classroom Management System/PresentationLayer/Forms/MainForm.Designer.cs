@@ -78,6 +78,69 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private Guna.UI2.WinForms.Guna2Button btnSubjectUpdate;
         private Guna.UI2.WinForms.Guna2Button btnSubjectDelete;
         private Guna.UI2.WinForms.Guna2DataGridView dgvSubjects;
+        private TabPage tabSections;
+        private TableLayoutPanel sectionsLayout;
+        private Guna.UI2.WinForms.Guna2Panel sectionsFormCard;
+        private FlowLayoutPanel sectionsFieldsPanel;
+        private FlowLayoutPanel sectionsButtonsPanel;
+        private Guna.UI2.WinForms.Guna2TextBox txtSectionName;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbSectionYear;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbSectionBranch;
+        private Guna.UI2.WinForms.Guna2NumericUpDown numStudentCount;
+        private Guna.UI2.WinForms.Guna2Button btnSectionAdd;
+        private Guna.UI2.WinForms.Guna2Button btnSectionUpdate;
+        private Guna.UI2.WinForms.Guna2Button btnSectionDelete;
+        private Guna.UI2.WinForms.Guna2DataGridView dgvSections;
+        private TabPage tabTimeSlots;
+        private TableLayoutPanel timeSlotsLayout;
+        private Guna.UI2.WinForms.Guna2Panel timeSlotsFormCard;
+        private FlowLayoutPanel timeSlotsFieldsPanel;
+        private FlowLayoutPanel timeSlotsButtonsPanel;
+        private Guna.UI2.WinForms.Guna2TextBox txtStartTime;
+        private Guna.UI2.WinForms.Guna2TextBox txtEndTime;
+        private Guna.UI2.WinForms.Guna2CheckBox chkIsBreak;
+        private Guna.UI2.WinForms.Guna2Button btnTimeSlotAdd;
+        private Guna.UI2.WinForms.Guna2Button btnTimeSlotUpdate;
+        private Guna.UI2.WinForms.Guna2Button btnTimeSlotDelete;
+        private Guna.UI2.WinForms.Guna2Button btnTimeSlotClear;
+        private Guna.UI2.WinForms.Guna2DataGridView dgvTimeSlots;
+        private TabPage tabTeaching;
+        private TableLayoutPanel teachingLayout;
+        private Guna.UI2.WinForms.Guna2Panel teachingFormCard;
+        private FlowLayoutPanel teachingFieldsPanel;
+        private FlowLayoutPanel teachingButtonsPanel;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbAssignFaculty;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbAssignSubject;
+        private Guna.UI2.WinForms.Guna2Button btnAssignmentAdd;
+        private Guna.UI2.WinForms.Guna2Button btnAssignmentRemove;
+        private Guna.UI2.WinForms.Guna2Button btnAssignmentClear;
+        private Guna.UI2.WinForms.Guna2DataGridView dgvAssignments;
+        private TabPage tabSchedule;
+        private TableLayoutPanel scheduleLayout;
+        private Guna.UI2.WinForms.Guna2Panel scheduleFormCard;
+        private FlowLayoutPanel scheduleFieldsPanel;
+        private FlowLayoutPanel scheduleButtonsPanel;
+        private Guna.UI2.WinForms.Guna2Panel scheduleFilterCard;
+        private FlowLayoutPanel scheduleFilterPanel;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbScheduleSubject;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbScheduleFaculty;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbScheduleClassroom;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbScheduleTimeSlot;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbScheduleDay;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbScheduleYear;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbScheduleBranch;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbScheduleSection;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbScheduleFilterFaculty;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbScheduleFilterSection;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbScheduleFilterYear;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbScheduleFilterDay;
+        private Guna.UI2.WinForms.Guna2Button btnScheduleGenerate;
+        private Guna.UI2.WinForms.Guna2Button btnScheduleAdd;
+        private Guna.UI2.WinForms.Guna2Button btnScheduleUpdate;
+        private Guna.UI2.WinForms.Guna2Button btnScheduleDelete;
+        private Guna.UI2.WinForms.Guna2Button btnScheduleClear;
+        private Guna.UI2.WinForms.Guna2Button btnScheduleExport;
+        private Guna.UI2.WinForms.Guna2DataGridView dgvSchedules;
 
         protected override void Dispose(bool disposing)
         {
@@ -208,6 +271,69 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             btnSubjectUpdate = new Guna.UI2.WinForms.Guna2Button();
             btnSubjectDelete = new Guna.UI2.WinForms.Guna2Button();
             dgvSubjects = new Guna.UI2.WinForms.Guna2DataGridView();
+            tabSections = new TabPage();
+            sectionsLayout = new TableLayoutPanel();
+            sectionsFormCard = new Guna.UI2.WinForms.Guna2Panel();
+            sectionsFieldsPanel = new FlowLayoutPanel();
+            sectionsButtonsPanel = new FlowLayoutPanel();
+            txtSectionName = new Guna.UI2.WinForms.Guna2TextBox();
+            cmbSectionYear = new Guna.UI2.WinForms.Guna2ComboBox();
+            cmbSectionBranch = new Guna.UI2.WinForms.Guna2ComboBox();
+            numStudentCount = new Guna.UI2.WinForms.Guna2NumericUpDown();
+            btnSectionAdd = new Guna.UI2.WinForms.Guna2Button();
+            btnSectionUpdate = new Guna.UI2.WinForms.Guna2Button();
+            btnSectionDelete = new Guna.UI2.WinForms.Guna2Button();
+            dgvSections = new Guna.UI2.WinForms.Guna2DataGridView();
+            tabTimeSlots = new TabPage();
+            timeSlotsLayout = new TableLayoutPanel();
+            timeSlotsFormCard = new Guna.UI2.WinForms.Guna2Panel();
+            timeSlotsFieldsPanel = new FlowLayoutPanel();
+            timeSlotsButtonsPanel = new FlowLayoutPanel();
+            txtStartTime = new Guna.UI2.WinForms.Guna2TextBox();
+            txtEndTime = new Guna.UI2.WinForms.Guna2TextBox();
+            chkIsBreak = new Guna.UI2.WinForms.Guna2CheckBox();
+            btnTimeSlotAdd = new Guna.UI2.WinForms.Guna2Button();
+            btnTimeSlotUpdate = new Guna.UI2.WinForms.Guna2Button();
+            btnTimeSlotDelete = new Guna.UI2.WinForms.Guna2Button();
+            btnTimeSlotClear = new Guna.UI2.WinForms.Guna2Button();
+            dgvTimeSlots = new Guna.UI2.WinForms.Guna2DataGridView();
+            tabTeaching = new TabPage();
+            teachingLayout = new TableLayoutPanel();
+            teachingFormCard = new Guna.UI2.WinForms.Guna2Panel();
+            teachingFieldsPanel = new FlowLayoutPanel();
+            teachingButtonsPanel = new FlowLayoutPanel();
+            cmbAssignFaculty = new Guna.UI2.WinForms.Guna2ComboBox();
+            cmbAssignSubject = new Guna.UI2.WinForms.Guna2ComboBox();
+            btnAssignmentAdd = new Guna.UI2.WinForms.Guna2Button();
+            btnAssignmentRemove = new Guna.UI2.WinForms.Guna2Button();
+            btnAssignmentClear = new Guna.UI2.WinForms.Guna2Button();
+            dgvAssignments = new Guna.UI2.WinForms.Guna2DataGridView();
+            tabSchedule = new TabPage();
+            scheduleLayout = new TableLayoutPanel();
+            scheduleFormCard = new Guna.UI2.WinForms.Guna2Panel();
+            scheduleFieldsPanel = new FlowLayoutPanel();
+            scheduleButtonsPanel = new FlowLayoutPanel();
+            scheduleFilterCard = new Guna.UI2.WinForms.Guna2Panel();
+            scheduleFilterPanel = new FlowLayoutPanel();
+            cmbScheduleSubject = new Guna.UI2.WinForms.Guna2ComboBox();
+            cmbScheduleFaculty = new Guna.UI2.WinForms.Guna2ComboBox();
+            cmbScheduleClassroom = new Guna.UI2.WinForms.Guna2ComboBox();
+            cmbScheduleTimeSlot = new Guna.UI2.WinForms.Guna2ComboBox();
+            cmbScheduleDay = new Guna.UI2.WinForms.Guna2ComboBox();
+            cmbScheduleYear = new Guna.UI2.WinForms.Guna2ComboBox();
+            cmbScheduleBranch = new Guna.UI2.WinForms.Guna2ComboBox();
+            cmbScheduleSection = new Guna.UI2.WinForms.Guna2ComboBox();
+            cmbScheduleFilterFaculty = new Guna.UI2.WinForms.Guna2ComboBox();
+            cmbScheduleFilterSection = new Guna.UI2.WinForms.Guna2ComboBox();
+            cmbScheduleFilterYear = new Guna.UI2.WinForms.Guna2ComboBox();
+            cmbScheduleFilterDay = new Guna.UI2.WinForms.Guna2ComboBox();
+            btnScheduleGenerate = new Guna.UI2.WinForms.Guna2Button();
+            btnScheduleAdd = new Guna.UI2.WinForms.Guna2Button();
+            btnScheduleUpdate = new Guna.UI2.WinForms.Guna2Button();
+            btnScheduleDelete = new Guna.UI2.WinForms.Guna2Button();
+            btnScheduleClear = new Guna.UI2.WinForms.Guna2Button();
+            btnScheduleExport = new Guna.UI2.WinForms.Guna2Button();
+            dgvSchedules = new Guna.UI2.WinForms.Guna2DataGridView();
             rootLayout.SuspendLayout();
             headerPanel.SuspendLayout();
             mainTabs.SuspendLayout();
@@ -217,6 +343,10 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             tabClassrooms.SuspendLayout();
             tabFaculty.SuspendLayout();
             tabSubjects.SuspendLayout();
+            tabSections.SuspendLayout();
+            tabTimeSlots.SuspendLayout();
+            tabTeaching.SuspendLayout();
+            tabSchedule.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvBranches).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgvStudyYears).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numClassroomCapacity).BeginInit();
@@ -227,6 +357,11 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             ((System.ComponentModel.ISupportInitialize)numPracticalHours).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numCreditUnits).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgvSubjects).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numStudentCount).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)dgvSections).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)dgvTimeSlots).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)dgvAssignments).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)dgvSchedules).BeginInit();
             SuspendLayout();
             //
             // rootLayout
@@ -310,6 +445,10 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             mainTabs.Controls.Add(tabClassrooms);
             mainTabs.Controls.Add(tabFaculty);
             mainTabs.Controls.Add(tabSubjects);
+            mainTabs.Controls.Add(tabSections);
+            mainTabs.Controls.Add(tabTimeSlots);
+            mainTabs.Controls.Add(tabTeaching);
+            mainTabs.Controls.Add(tabSchedule);
             mainTabs.Dock = DockStyle.Fill;
             mainTabs.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             mainTabs.ItemSize = new Size(150, 42);
@@ -440,6 +579,74 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             subjectsLayout.Name = "subjectsLayout";
             subjectsLayout.Size = new Size(200, 100);
             subjectsLayout.TabIndex = 0;
+            //
+            // tabSections
+            //
+            tabSections.Controls.Add(sectionsLayout);
+            tabSections.Location = new Point(154, 4);
+            tabSections.Name = "tabSections";
+            tabSections.Size = new Size(1090, 688);
+            tabSections.TabIndex = 6;
+            tabSections.Text = "Sections";
+            //
+            // sectionsLayout
+            //
+            sectionsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            sectionsLayout.Location = new Point(0, 0);
+            sectionsLayout.Name = "sectionsLayout";
+            sectionsLayout.Size = new Size(200, 100);
+            sectionsLayout.TabIndex = 0;
+            //
+            // tabTimeSlots
+            //
+            tabTimeSlots.Controls.Add(timeSlotsLayout);
+            tabTimeSlots.Location = new Point(154, 4);
+            tabTimeSlots.Name = "tabTimeSlots";
+            tabTimeSlots.Size = new Size(1090, 688);
+            tabTimeSlots.TabIndex = 7;
+            tabTimeSlots.Text = "Time Slots";
+            //
+            // timeSlotsLayout
+            //
+            timeSlotsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            timeSlotsLayout.Location = new Point(0, 0);
+            timeSlotsLayout.Name = "timeSlotsLayout";
+            timeSlotsLayout.Size = new Size(200, 100);
+            timeSlotsLayout.TabIndex = 0;
+            //
+            // tabTeaching
+            //
+            tabTeaching.Controls.Add(teachingLayout);
+            tabTeaching.Location = new Point(154, 4);
+            tabTeaching.Name = "tabTeaching";
+            tabTeaching.Size = new Size(1090, 688);
+            tabTeaching.TabIndex = 8;
+            tabTeaching.Text = "Teaching";
+            //
+            // teachingLayout
+            //
+            teachingLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            teachingLayout.Location = new Point(0, 0);
+            teachingLayout.Name = "teachingLayout";
+            teachingLayout.Size = new Size(200, 100);
+            teachingLayout.TabIndex = 0;
+            //
+            // tabSchedule
+            //
+            tabSchedule.Controls.Add(scheduleLayout);
+            tabSchedule.Location = new Point(154, 4);
+            tabSchedule.Name = "tabSchedule";
+            tabSchedule.Size = new Size(1090, 688);
+            tabSchedule.TabIndex = 9;
+            tabSchedule.Text = "Schedule";
+            //
+            // scheduleLayout
+            //
+            scheduleLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            scheduleLayout.Location = new Point(0, 0);
+            scheduleLayout.Name = "scheduleLayout";
+            scheduleLayout.Size = new Size(200, 100);
+            scheduleLayout.TabIndex = 0;
             //
             // branchesFormCard
             //
@@ -798,6 +1005,10 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             tabClassrooms.ResumeLayout(false);
             tabFaculty.ResumeLayout(false);
             tabSubjects.ResumeLayout(false);
+            tabSections.ResumeLayout(false);
+            tabTimeSlots.ResumeLayout(false);
+            tabTeaching.ResumeLayout(false);
+            tabSchedule.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvBranches).EndInit();
             ((System.ComponentModel.ISupportInitialize)dgvStudyYears).EndInit();
             ((System.ComponentModel.ISupportInitialize)numClassroomCapacity).EndInit();
@@ -808,6 +1019,11 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             ((System.ComponentModel.ISupportInitialize)numPracticalHours).EndInit();
             ((System.ComponentModel.ISupportInitialize)numCreditUnits).EndInit();
             ((System.ComponentModel.ISupportInitialize)dgvSubjects).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numStudentCount).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dgvSections).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dgvTimeSlots).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dgvAssignments).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dgvSchedules).EndInit();
             ResumeLayout(false);
         }
 
@@ -903,6 +1119,90 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             AddDesignerButton(subjectsButtonsPanel, btnSubjectAdd, "Add", SuccessColor);
             AddDesignerButton(subjectsButtonsPanel, btnSubjectUpdate, "Update", PrimaryColor);
             AddDesignerButton(subjectsButtonsPanel, btnSubjectDelete, "Delete", DangerColor);
+
+            CreateDataDesignerPage(
+                sectionsLayout,
+                sectionsFormCard,
+                sectionsFieldsPanel,
+                sectionsButtonsPanel,
+                dgvSections,
+                "Sections",
+                "Manage student groups and their size.");
+            AddDesignerTextField(sectionsFieldsPanel, "Section name", txtSectionName, "A");
+            AddDesignerLookupComboField(sectionsFieldsPanel, "Study year", cmbSectionYear);
+            AddDesignerLookupComboField(sectionsFieldsPanel, "Branch", cmbSectionBranch);
+            AddDesignerNumberField(sectionsFieldsPanel, "Students", numStudentCount, 150, 1, 1000, 30);
+            AddDesignerButton(sectionsButtonsPanel, btnSectionAdd, "Add", SuccessColor);
+            AddDesignerButton(sectionsButtonsPanel, btnSectionUpdate, "Update", PrimaryColor);
+            AddDesignerButton(sectionsButtonsPanel, btnSectionDelete, "Delete", DangerColor);
+
+            CreateDataDesignerPage(
+                timeSlotsLayout,
+                timeSlotsFormCard,
+                timeSlotsFieldsPanel,
+                timeSlotsButtonsPanel,
+                dgvTimeSlots,
+                "Time Slots",
+                "Create teaching periods and break periods.");
+            AddDesignerTextField(timeSlotsFieldsPanel, "Start time", txtStartTime, "08:30");
+            AddDesignerTextField(timeSlotsFieldsPanel, "End time", txtEndTime, "10:00");
+            AddDesignerCheckBox(timeSlotsFieldsPanel, chkIsBreak, "Break period");
+            AddDesignerButton(timeSlotsButtonsPanel, btnTimeSlotAdd, "Add", SuccessColor);
+            AddDesignerButton(timeSlotsButtonsPanel, btnTimeSlotUpdate, "Update", PrimaryColor);
+            AddDesignerButton(timeSlotsButtonsPanel, btnTimeSlotDelete, "Delete", DangerColor);
+            AddDesignerButton(timeSlotsButtonsPanel, btnTimeSlotClear, "Clear", MutedColor);
+
+            CreateDataDesignerPage(
+                teachingLayout,
+                teachingFormCard,
+                teachingFieldsPanel,
+                teachingButtonsPanel,
+                dgvAssignments,
+                "Teaching",
+                "Assign instructors to subjects before scheduling.");
+            AddDesignerLookupComboField(teachingFieldsPanel, "Faculty member", cmbAssignFaculty);
+            AddDesignerLookupComboField(teachingFieldsPanel, "Subject", cmbAssignSubject);
+            AddDesignerButton(teachingButtonsPanel, btnAssignmentAdd, "Assign", SuccessColor);
+            AddDesignerButton(teachingButtonsPanel, btnAssignmentRemove, "Remove", DangerColor);
+            AddDesignerButton(teachingButtonsPanel, btnAssignmentClear, "Clear", MutedColor);
+
+            CreateScheduleDesignerPage(
+                scheduleLayout,
+                scheduleFormCard,
+                scheduleFieldsPanel,
+                scheduleButtonsPanel,
+                scheduleFilterCard,
+                scheduleFilterPanel,
+                dgvSchedules);
+            AddDesignerLookupComboField(scheduleFieldsPanel, "Subject", cmbScheduleSubject);
+            AddDesignerLookupComboField(scheduleFieldsPanel, "Faculty", cmbScheduleFaculty);
+            AddDesignerLookupComboField(scheduleFieldsPanel, "Classroom", cmbScheduleClassroom);
+            AddDesignerLookupComboField(scheduleFieldsPanel, "Time slot", cmbScheduleTimeSlot);
+            AddDesignerComboField(
+                scheduleFieldsPanel,
+                "Day",
+                cmbScheduleDay,
+                new object[] { "Select day", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" },
+                0);
+            AddDesignerLookupComboField(scheduleFieldsPanel, "Study year", cmbScheduleYear);
+            AddDesignerLookupComboField(scheduleFieldsPanel, "Branch", cmbScheduleBranch);
+            AddDesignerLookupComboField(scheduleFieldsPanel, "Section", cmbScheduleSection);
+            AddDesignerButton(scheduleButtonsPanel, btnScheduleGenerate, "Generate", HeaderColor, 132);
+            AddDesignerButton(scheduleButtonsPanel, btnScheduleAdd, "Add", SuccessColor);
+            AddDesignerButton(scheduleButtonsPanel, btnScheduleUpdate, "Update", PrimaryColor);
+            AddDesignerButton(scheduleButtonsPanel, btnScheduleDelete, "Delete", DangerColor);
+            AddDesignerButton(scheduleButtonsPanel, btnScheduleClear, "Clear", MutedColor);
+            AddDesignerButton(scheduleButtonsPanel, btnScheduleExport, "Export PDF", SuccessColor, 132);
+
+            AddDesignerLookupComboField(scheduleFilterPanel, "Faculty filter", cmbScheduleFilterFaculty, 180);
+            AddDesignerLookupComboField(scheduleFilterPanel, "Section filter", cmbScheduleFilterSection, 250);
+            AddDesignerLookupComboField(scheduleFilterPanel, "Study year filter", cmbScheduleFilterYear, 170);
+            AddDesignerComboField(
+                scheduleFilterPanel,
+                "Day filter",
+                cmbScheduleFilterDay,
+                new object[] { "All days", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" },
+                0);
         }
 
         private void CreateDashboardDesignerCards()
@@ -1070,6 +1370,87 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             pageLayout.Controls.Add(grid, 0, 2);
         }
 
+        private void CreateScheduleDesignerPage(
+            TableLayoutPanel pageLayout,
+            Guna.UI2.WinForms.Guna2Panel formCard,
+            FlowLayoutPanel fieldsPanel,
+            FlowLayoutPanel buttonsPanel,
+            Guna.UI2.WinForms.Guna2Panel filterCard,
+            FlowLayoutPanel filterPanel,
+            Guna.UI2.WinForms.Guna2DataGridView grid)
+        {
+            var heading = new Panel { Dock = DockStyle.Fill, BackColor = AppBackground };
+
+            heading.Controls.Add(new Label
+            {
+                Text = "Schedule",
+                AutoSize = true,
+                Font = new Font("Segoe UI", 20F, FontStyle.Bold),
+                ForeColor = HeaderColor,
+                BackColor = Color.Transparent,
+                Location = new Point(0, 4)
+            });
+            heading.Controls.Add(new Label
+            {
+                Text = "Build the timetable with conflict checks.",
+                AutoSize = true,
+                Font = new Font("Segoe UI", 10F),
+                ForeColor = MutedColor,
+                BackColor = Color.Transparent,
+                Location = new Point(2, 46)
+            });
+
+            pageLayout.BackColor = AppBackground;
+            pageLayout.ColumnCount = 1;
+            pageLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            pageLayout.Dock = DockStyle.Fill;
+            pageLayout.Location = new Point(0, 0);
+            pageLayout.Padding = new Padding(10);
+            pageLayout.RowCount = 4;
+            pageLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 72F));
+            pageLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 250F));
+            pageLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 96F));
+            pageLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+
+            formCard.BorderRadius = 12;
+            formCard.Dock = DockStyle.Fill;
+            formCard.FillColor = CardBackground;
+            formCard.Padding = new Padding(18);
+
+            fieldsPanel.BackColor = CardBackground;
+            fieldsPanel.Dock = DockStyle.Top;
+            fieldsPanel.FlowDirection = FlowDirection.LeftToRight;
+            fieldsPanel.Height = 164;
+            fieldsPanel.WrapContents = true;
+
+            buttonsPanel.BackColor = CardBackground;
+            buttonsPanel.Dock = DockStyle.Bottom;
+            buttonsPanel.FlowDirection = FlowDirection.LeftToRight;
+            buttonsPanel.Height = 50;
+            buttonsPanel.WrapContents = false;
+
+            filterCard.BorderRadius = 12;
+            filterCard.Dock = DockStyle.Fill;
+            filterCard.FillColor = CardBackground;
+            filterCard.Padding = new Padding(18, 10, 18, 8);
+            filterCard.Margin = new Padding(0, 0, 0, 10);
+
+            filterPanel.BackColor = CardBackground;
+            filterPanel.Dock = DockStyle.Fill;
+            filterPanel.FlowDirection = FlowDirection.LeftToRight;
+            filterPanel.WrapContents = false;
+
+            ConfigureDesignerGrid(grid);
+
+            formCard.Controls.Add(buttonsPanel);
+            formCard.Controls.Add(fieldsPanel);
+            filterCard.Controls.Add(filterPanel);
+            pageLayout.Controls.Add(heading, 0, 0);
+            pageLayout.Controls.Add(formCard, 0, 1);
+            pageLayout.Controls.Add(filterCard, 0, 2);
+            pageLayout.Controls.Add(grid, 0, 3);
+        }
+
         private void AddDesignerTextField(FlowLayoutPanel fieldsPanel, string labelText, Guna.UI2.WinForms.Guna2TextBox input, string placeholder)
         {
             input.BorderColor = BorderColor;
@@ -1136,6 +1517,24 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             fieldsPanel.Controls.Add(CreateDesignerFieldPanel(labelText, input, 220));
         }
 
+        private void AddDesignerCheckBox(
+            FlowLayoutPanel fieldsPanel,
+            Guna.UI2.WinForms.Guna2CheckBox input,
+            string text)
+        {
+            input.Text = text;
+            input.AutoSize = true;
+            input.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            input.ForeColor = HeaderColor;
+            input.BackColor = Color.Transparent;
+            input.CheckedState.FillColor = PrimaryColor;
+            input.CheckedState.BorderColor = PrimaryColor;
+            input.UncheckedState.FillColor = CardBackground;
+            input.UncheckedState.BorderColor = BorderColor;
+            input.Margin = new Padding(0, 24, 16, 8);
+            fieldsPanel.Controls.Add(input);
+        }
+
         private void ConfigureDesignerFilterCombo(Guna.UI2.WinForms.Guna2ComboBox input, int width)
         {
             ConfigureDesignerCombo(input, width);
@@ -1182,7 +1581,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             return panel;
         }
 
-        private void AddDesignerButton(FlowLayoutPanel buttonsPanel, Guna.UI2.WinForms.Guna2Button button, string text, Color fillColor)
+        private void AddDesignerButton(FlowLayoutPanel buttonsPanel, Guna.UI2.WinForms.Guna2Button button, string text, Color fillColor, int width = 112)
         {
             button.BorderRadius = 9;
             button.FillColor = fillColor;
@@ -1191,7 +1590,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             button.Height = 40;
             button.Margin = new Padding(0, 6, 10, 0);
             button.Text = text;
-            button.Width = 112;
+            button.Width = width;
             buttonsPanel.Controls.Add(button);
         }
 
