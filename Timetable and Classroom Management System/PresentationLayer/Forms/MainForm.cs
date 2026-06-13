@@ -15,6 +15,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private static readonly Color SuccessColor = Color.FromArgb(16, 185, 129);
         private static readonly Color DangerColor = Color.FromArgb(239, 68, 68);
         private static readonly Color MutedColor = Color.FromArgb(100, 116, 139);
+        private const int AutomaticScheduleSemester = 2;
 
         private readonly BranchService _branchService = new BranchService();
         private readonly StudyYearService _studyYearService = new StudyYearService();
@@ -1025,7 +1026,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private void GenerateAutomaticSchedule()
         {
             DialogResult confirmation = MessageBox.Show(
-                "Generate a new timetable and replace all existing schedule entries?",
+                $"Generate a new semester {AutomaticScheduleSemester} timetable and replace all existing schedule entries?",
                 "Generate Schedule",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
@@ -1037,7 +1038,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
             try
             {
-                ScheduleGenerationResult result = _scheduleService.GenerateAutomaticSchedule(replaceExistingSchedules: true);
+                ScheduleGenerationResult result = _scheduleService.GenerateAutomaticSchedule(replaceExistingSchedules: true, AutomaticScheduleSemester);
                 RefreshAllData();
                 ClearScheduleInputs();
                 ShowInfo(BuildGenerationMessage(result));
@@ -1469,7 +1470,9 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         {
             var lines = new List<string>
             {
-                $"Generated {result.CreatedCount} schedule entries."
+                result.SemesterNumber.HasValue
+                    ? $"Generated {result.CreatedCount} schedule entries for semester {result.SemesterNumber.Value}."
+                    : $"Generated {result.CreatedCount} schedule entries."
             };
 
             if (result.SkippedCount > 0)
@@ -1520,9 +1523,14 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 innerException = innerException.InnerException;
             }
 
+            if (parts.Any(part => part.Contains("UQ_Section_Time", StringComparison.OrdinalIgnoreCase)))
+            {
+                return "This section already has a class at this day and time. Choose another day/time or edit the existing schedule entry.";
+            }
+
             if (parts.Any(part => part.Contains("UQ_Year_Branch_Time", StringComparison.OrdinalIgnoreCase)))
             {
-                return "This study year and branch already have a class at this day and time. Choose another day/time or edit the existing schedule entry.";
+                return "The database still has the old year/branch schedule constraint. Restart the app so it can update the schedule schema, then try again.";
             }
 
             return string.Join(Environment.NewLine + Environment.NewLine, parts.Distinct());

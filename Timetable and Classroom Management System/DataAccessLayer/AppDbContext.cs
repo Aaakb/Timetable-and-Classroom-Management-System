@@ -11,15 +11,15 @@ namespace Timetable_and_Classroom_Management_System.DataAccessLayer
 {
     public class AppDbContext : DbContext
     {
-        public DbSet<Branch> Branches { get; set; }
-        public DbSet<Classroom> Classrooms { get; set; }
-        public DbSet<FacultyMember> FacultyMembers { get; set; }
-        public DbSet<FacultyMemberSubject> FacultyMemberSubjects { get; set; }
-        public DbSet<Schedule> Schedules { get; set; }
-        public DbSet<Section> Sections { get; set; }
-        public DbSet<StudyYear> StudyYears { get; set; }
-        public DbSet<Subject> Subjects { get; set; }
-        public DbSet<TimeSlot> TimeSlots { get; set; }
+        public DbSet<Branch> Branches { get; set; } = null!;
+        public DbSet<Classroom> Classrooms { get; set; } = null!;
+        public DbSet<FacultyMember> FacultyMembers { get; set; } = null!;
+        public DbSet<FacultyMemberSubject> FacultyMemberSubjects { get; set; } = null!;
+        public DbSet<Schedule> Schedules { get; set; } = null!;
+        public DbSet<Section> Sections { get; set; } = null!;
+        public DbSet<StudyYear> StudyYears { get; set; } = null!;
+        public DbSet<Subject> Subjects { get; set; } = null!;
+        public DbSet<TimeSlot> TimeSlots { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -41,6 +41,22 @@ namespace Timetable_and_Classroom_Management_System.DataAccessLayer
 
             modelBuilder.Entity<FacultyMemberSubject>()
                 .HasKey(fms => new { fms.FacultyMemberID, fms.SubjectID });
+
+            modelBuilder.Entity<Schedule>()
+                .HasIndex(s => new { s.ClassroomID, s.DayOfWeek, s.TimeSlotID })
+                .IsUnique()
+                .HasDatabaseName("UQ_Classroom_Time");
+
+            modelBuilder.Entity<Schedule>()
+                .HasIndex(s => new { s.FacultyMemberID, s.DayOfWeek, s.TimeSlotID })
+                .IsUnique()
+                .HasDatabaseName("UQ_Faculty_Time");
+
+            modelBuilder.Entity<Schedule>()
+                .HasIndex(s => new { s.SectionID, s.DayOfWeek, s.TimeSlotID })
+                .IsUnique()
+                .HasFilter("[SectionID] IS NOT NULL")
+                .HasDatabaseName("UQ_Section_Time");
 
             modelBuilder.Entity<FacultyMemberSubject>()
                 .HasOne(fms => fms.FacultyMember)

@@ -59,7 +59,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
             using AppDbContext context = new AppDbContext();
 
             ValidateScheduleInput(context, subjectId, facultyMemberId, classroomId, timeSlotId, dayOfWeek, studyYearId, branchId, sectionId);
-            EnsureNoScheduleConflicts(context, 0, facultyMemberId, classroomId, timeSlotId, dayOfWeek, studyYearId!.Value, branchId, sectionId);
+            EnsureNoScheduleConflicts(context, 0, facultyMemberId, classroomId, timeSlotId, dayOfWeek, sectionId);
 
             Schedule schedule = new Schedule
             {
@@ -106,7 +106,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
             }
 
             ValidateScheduleInput(context, subjectId, facultyMemberId, classroomId, timeSlotId, dayOfWeek, studyYearId, branchId, sectionId);
-            EnsureNoScheduleConflicts(context, scheduleId, facultyMemberId, classroomId, timeSlotId, dayOfWeek, studyYearId!.Value, branchId, sectionId);
+            EnsureNoScheduleConflicts(context, scheduleId, facultyMemberId, classroomId, timeSlotId, dayOfWeek, sectionId);
 
             schedule.SubjectID = subjectId;
             schedule.FacultyMemberID = facultyMemberId;
@@ -141,11 +141,18 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
             context.SaveChanges();
         }
 
-        public ScheduleGenerationResult GenerateAutomaticSchedule(bool replaceExistingSchedules)
+        public ScheduleGenerationResult GenerateAutomaticSchedule(bool replaceExistingSchedules, int? semesterNumber = null)
         {
             using AppDbContext context = new AppDbContext();
 
-            List<Subject> subjects = context.Subjects
+            IQueryable<Subject> subjectQuery = context.Subjects;
+
+            if (semesterNumber.HasValue)
+            {
+                subjectQuery = subjectQuery.Where(s => s.SemesterNumber == semesterNumber.Value);
+            }
+
+            List<Subject> subjects = subjectQuery
                 .OrderBy(s => s.StudyYearID)
                 .ThenBy(s => s.BranchID)
                 .ThenBy(s => s.SubjectName)
@@ -166,7 +173,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
             List<FacultyMemberSubject> assignments = context.FacultyMemberSubjects
                 .ToList();
 
-            ValidateGenerationData(subjects, sections, classrooms, timeSlots, assignments);
+            ValidateGenerationData(subjects, sections, classrooms, timeSlots, assignments, semesterNumber);
 
             using var transaction = context.Database.BeginTransaction();
 
@@ -204,6 +211,8 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
                     int alreadyScheduled = allSchedules.Count(s => s.SubjectID == subject.SubjectID && s.SectionID == section.SectionID);
                     int remainingSessions = Math.Max(0, requiredSessions - alreadyScheduled);
 
+                    int skippedForSubject = 0;
+
                     for (int sessionIndex = 0; sessionIndex < remainingSessions; sessionIndex++)
                     {
                         Schedule? schedule = CreateBestScheduleEntry(
@@ -219,7 +228,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
                         if (schedule == null)
                         {
                             skippedCount++;
-                            warnings.Add($"Could not place {subject.SubjectName} for section {section.SectionName}.");
+                            skippedForSubject++;
                             continue;
                         }
 
@@ -230,13 +239,19 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
 
                         createdCount++;
                     }
+
+                    if (skippedForSubject > 0)
+                    {
+                        string sessionLabel = skippedForSubject == 1 ? "session" : "sessions";
+                        warnings.Add($"Could not place {skippedForSubject} {sessionLabel} of {subject.SubjectName} for section {section.SectionName}.");
+                    }
                 }
             }
 
             context.SaveChanges();
             transaction.Commit();
 
-            return new ScheduleGenerationResult(createdCount, skippedCount, warnings);
+            return new ScheduleGenerationResult(createdCount, skippedCount, warnings, semesterNumber);
         }
 
         private static void ValidateGenerationData(
@@ -244,7 +259,8 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
             List<Section> sections,
             List<Classroom> classrooms,
             List<TimeSlot> timeSlots,
-            List<FacultyMemberSubject> assignments)
+            List<FacultyMemberSubject> assignments,
+            int? semesterNumber)
         {
             if (sections.Count == 0)
             {
@@ -253,7 +269,8 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
 
             if (subjects.Count == 0)
             {
-                throw new Exception("Add subjects before generating a schedule.");
+                string suffix = semesterNumber.HasValue ? $" for semester {semesterNumber.Value}" : string.Empty;
+                throw new Exception($"Add subjects{suffix} before generating a schedule.");
             }
 
             if (classrooms.Count == 0)
@@ -352,7 +369,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
                     {
                         foreach (Classroom classroom in classrooms.OrderBy(c => GetLoad(classroomLoad, c.ClassroomID)).ThenBy(c => c.Capacity))
                         {
-                            if (HasSchedulingConflict(allSchedules, facultyId, classroom.ClassroomID, section.SectionID, section.StudyYearID, section.BranchID, timeSlot.TimeSlotID, day))
+                            if (HasSchedulingConflict(allSchedules, facultyId, classroom.ClassroomID, section.SectionID, timeSlot.TimeSlotID, day))
                             {
                                 continue;
                             }
@@ -393,8 +410,6 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
             int facultyMemberId,
             int classroomId,
             int sectionId,
-            int studyYearId,
-            int? branchId,
             int timeSlotId,
             string dayOfWeek)
         {
@@ -403,7 +418,6 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
                 s.TimeSlotID == timeSlotId &&
                 (s.FacultyMemberID == facultyMemberId ||
                  s.ClassroomID == classroomId ||
-                 (s.StudyYearID == studyYearId && s.BranchID == branchId) ||
                  s.SectionID == sectionId));
         }
 
@@ -598,23 +612,8 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
             int classroomId,
             int timeSlotId,
             string dayOfWeek,
-            int studyYearId,
-            int? branchId,
             int? sectionId)
         {
-            bool yearBranchTimeConflict = context.Schedules
-                .Any(s =>
-                    s.ScheduleID != scheduleId &&
-                    s.DayOfWeek == dayOfWeek &&
-                    s.TimeSlotID == timeSlotId &&
-                    s.StudyYearID == studyYearId &&
-                    s.BranchID == branchId);
-
-            if (yearBranchTimeConflict)
-            {
-                throw new Exception("This study year and branch already have a class at this day and time. Choose another day/time or edit the existing schedule entry.");
-            }
-
             bool facultyConflict = context.Schedules
                 .Any(s =>
                     s.ScheduleID != scheduleId &&
@@ -675,16 +674,19 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
 
     public sealed class ScheduleGenerationResult
     {
-        public ScheduleGenerationResult(int createdCount, int skippedCount, IReadOnlyList<string> warnings)
+        public ScheduleGenerationResult(int createdCount, int skippedCount, IReadOnlyList<string> warnings, int? semesterNumber)
         {
             CreatedCount = createdCount;
             SkippedCount = skippedCount;
             Warnings = warnings;
+            SemesterNumber = semesterNumber;
         }
 
         public int CreatedCount { get; }
 
         public int SkippedCount { get; }
+
+        public int? SemesterNumber { get; }
 
         public IReadOnlyList<string> Warnings { get; }
     }
