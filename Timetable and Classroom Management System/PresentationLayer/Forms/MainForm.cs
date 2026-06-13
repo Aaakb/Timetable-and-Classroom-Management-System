@@ -107,6 +107,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private Guna2ComboBox cmbScheduleBranch = null!;
         private Guna2ComboBox cmbScheduleSection = null!;
         private int selectedScheduleId;
+        private bool isClearingScheduleInputs;
 
         public MainForm()
         {
@@ -495,6 +496,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
             cmbScheduleDay.Items.AddRange(new object[]
             {
+                "Select day",
                 "Sunday",
                 "Monday",
                 "Tuesday",
@@ -519,9 +521,9 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             generateButton.Width = 132;
             buttons.Controls.Add(generateButton);
             buttons.Controls.Add(CreateActionButton("Add", SuccessColor, (_, _) =>
-                RunCommand(() => _scheduleService.AddSchedule(SelectedId(cmbScheduleSubject), SelectedId(cmbScheduleFaculty), SelectedId(cmbScheduleClassroom), SelectedId(cmbScheduleTimeSlot), cmbScheduleDay.Text, SelectedOptionalId(cmbScheduleYear), SelectedOptionalId(cmbScheduleBranch), SelectedOptionalId(cmbScheduleSection)), "Schedule entry added successfully.", ClearScheduleInputs)));
+                RunCommand(() => _scheduleService.AddSchedule(SelectedId(cmbScheduleSubject), SelectedId(cmbScheduleFaculty), SelectedId(cmbScheduleClassroom), SelectedId(cmbScheduleTimeSlot), ReadScheduleDay(), SelectedOptionalId(cmbScheduleYear), SelectedOptionalId(cmbScheduleBranch), SelectedOptionalId(cmbScheduleSection)), "Schedule entry added successfully.", ClearScheduleInputs)));
             buttons.Controls.Add(CreateActionButton("Update", PrimaryColor, (_, _) =>
-                RunCommand(() => _scheduleService.UpdateSchedule(selectedScheduleId, SelectedId(cmbScheduleSubject), SelectedId(cmbScheduleFaculty), SelectedId(cmbScheduleClassroom), SelectedId(cmbScheduleTimeSlot), cmbScheduleDay.Text, SelectedOptionalId(cmbScheduleYear), SelectedOptionalId(cmbScheduleBranch), SelectedOptionalId(cmbScheduleSection)), "Schedule entry updated successfully.", ClearScheduleInputs)));
+                RunCommand(() => _scheduleService.UpdateSchedule(selectedScheduleId, SelectedId(cmbScheduleSubject), SelectedId(cmbScheduleFaculty), SelectedId(cmbScheduleClassroom), SelectedId(cmbScheduleTimeSlot), ReadScheduleDay(), SelectedOptionalId(cmbScheduleYear), SelectedOptionalId(cmbScheduleBranch), SelectedOptionalId(cmbScheduleSection)), "Schedule entry updated successfully.", ClearScheduleInputs)));
             buttons.Controls.Add(CreateActionButton("Delete", DangerColor, (_, _) =>
                 ConfirmAndRun("Delete selected schedule entry?", () => _scheduleService.DeleteSchedule(selectedScheduleId), "Schedule entry deleted successfully.", ClearScheduleInputs)));
             buttons.Controls.Add(CreateActionButton("Clear", MutedColor, (_, _) => ClearScheduleInputs()));
@@ -1320,20 +1322,34 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
         private void ClearScheduleInputs()
         {
-            selectedScheduleId = 0;
-            SetComboValue(cmbScheduleSubject, 0);
-            SetComboValue(cmbScheduleFaculty, 0);
-            SetComboValue(cmbScheduleClassroom, 0);
-            SetComboValue(cmbScheduleTimeSlot, 0);
-            cmbScheduleDay.SelectedIndex = -1;
-            SetComboValue(cmbScheduleYear, 0);
-            SetComboValue(cmbScheduleBranch, 0);
-            SetComboValue(cmbScheduleSection, 0);
-            ClearGridSelection(dgvSchedules);
+            isClearingScheduleInputs = true;
+
+            try
+            {
+                selectedScheduleId = 0;
+                SetComboValue(cmbScheduleSubject, 0);
+                SetComboValue(cmbScheduleFaculty, 0);
+                SetComboValue(cmbScheduleClassroom, 0);
+                SetComboValue(cmbScheduleTimeSlot, 0);
+                cmbScheduleDay.SelectedIndex = cmbScheduleDay.Items.Count > 0 ? 0 : -1;
+                SetComboValue(cmbScheduleYear, 0);
+                SetComboValue(cmbScheduleBranch, 0);
+                SetComboValue(cmbScheduleSection, 0);
+                ClearGridSelection(dgvSchedules);
+            }
+            finally
+            {
+                isClearingScheduleInputs = false;
+            }
         }
 
         private void SyncScheduleSectionContext()
         {
+            if (isClearingScheduleInputs)
+            {
+                return;
+            }
+
             int sectionId = SelectedId(cmbScheduleSection);
             Section? section = _sections.FirstOrDefault(s => s.SectionID == sectionId);
 
@@ -1344,6 +1360,18 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
             SetComboValue(cmbScheduleYear, section.StudyYearID);
             SetComboValue(cmbScheduleBranch, section.BranchID ?? 0);
+        }
+
+        private string ReadScheduleDay()
+        {
+            string day = cmbScheduleDay.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(day) || day == "Select day")
+            {
+                throw new Exception("Please select a day.");
+            }
+
+            return day;
         }
 
         private string GetBranchName(int? branchId)
@@ -1499,6 +1527,11 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             try
             {
                 comboBox.SelectedValue = id;
+
+                if (SelectedId(comboBox) != id)
+                {
+                    SelectFirst(comboBox);
+                }
             }
             catch
             {
