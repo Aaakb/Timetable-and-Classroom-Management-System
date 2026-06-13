@@ -339,7 +339,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 RunCommand(() => _classroomService.UpdateClassroom(selectedClassroomId, txtClassroomNumber.Text, (int)numClassroomCapacity.Value, SelectedRoomType()), "Classroom updated successfully.", ClearClassroomInputs)));
             buttons.Controls.Add(CreateActionButton("Delete", DangerColor, (_, _) =>
                 ConfirmAndRun("Delete selected classroom?", () => _classroomService.DeleteClassroom(selectedClassroomId), "Classroom deleted successfully.", ClearClassroomInputs)));
-            buttons.Controls.Add(CreateActionButton("Clear", MutedColor, (_, _) => ClearClassroomInputs()));
 
             dgvClassrooms.CellClick += DgvClassrooms_CellClick;
             return page;
