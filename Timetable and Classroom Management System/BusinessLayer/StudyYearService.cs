@@ -16,7 +16,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
 
         public void AddStudyYear(string yearName)
         {
-            yearName = yearName.Trim();
+            yearName = ReferenceNameNormalizer.NormalizeStudyYearName(yearName);
 
             if (string.IsNullOrWhiteSpace(yearName))
             {
@@ -44,7 +44,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
 
         public void UpdateStudyYear(int studyYearId, string yearName)
         {
-            yearName = yearName.Trim();
+            yearName = ReferenceNameNormalizer.NormalizeStudyYearName(yearName);
 
             if (studyYearId <= 0)
             {

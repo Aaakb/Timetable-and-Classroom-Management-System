@@ -16,8 +16,12 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
 
             foreach (WeeklyScheduleSeed seed in ScheduleSeeds)
             {
-                StudyYear studyYear = EnsureStudyYear(context, seed.StudyYear);
-                Branch? branch = seed.BranchName == null ? null : EnsureBranch(context, seed.BranchName);
+                string studyYearName = ReferenceNameNormalizer.NormalizeStudyYearName(seed.StudyYear);
+                string? branchName = seed.BranchName == null
+                    ? null
+                    : ReferenceNameNormalizer.NormalizeBranchName(seed.BranchName);
+                StudyYear studyYear = EnsureStudyYear(context, studyYearName);
+                Branch? branch = branchName == null ? null : EnsureBranch(context, branchName);
                 Section section = EnsureSection(context, seed.SectionName, studyYear.StudyYearID, branch?.BranchID);
                 Subject subject = EnsureSubject(context, seed.SubjectName, studyYear.StudyYearID, branch?.BranchID, seed.IsPractical);
                 FacultyMember facultyMember = EnsureFacultyMember(context, seed.FacultyName);
@@ -51,7 +55,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
                 if (hasConflict)
                 {
                     skippedSchedules++;
-                    warnings.Add($"{seed.StudyYear} {seed.SectionName}: {seed.SubjectName} on {seed.DayOfWeek} {seed.StartTime:hh\\:mm} was skipped because it conflicts with an existing entry.");
+                    warnings.Add($"{studyYearName} {seed.SectionName}: {seed.SubjectName} on {seed.DayOfWeek} {seed.StartTime:hh\\:mm} was skipped because it conflicts with an existing entry.");
                     continue;
                 }
 
@@ -77,6 +81,8 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
 
         private static StudyYear EnsureStudyYear(AppDbContext context, string yearName)
         {
+            yearName = ReferenceNameNormalizer.NormalizeStudyYearName(yearName);
+
             StudyYear? studyYear = context.StudyYears.FirstOrDefault(y => y.YearName == yearName);
 
             if (studyYear != null)
@@ -92,6 +98,8 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
 
         private static Branch EnsureBranch(AppDbContext context, string branchName)
         {
+            branchName = ReferenceNameNormalizer.NormalizeBranchName(branchName);
+
             Branch? branch = context.Branches.FirstOrDefault(b => b.BranchName == branchName);
 
             if (branch != null)

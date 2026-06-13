@@ -17,8 +17,12 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
 
             foreach (CurriculumSubject source in Subjects)
             {
-                int studyYearId = studyYears[source.StudyYear].StudyYearID;
-                int? branchId = source.BranchName == null ? null : branches[source.BranchName].BranchID;
+                string studyYearName = ReferenceNameNormalizer.NormalizeStudyYearName(source.StudyYear);
+                string? branchName = source.BranchName == null
+                    ? null
+                    : ReferenceNameNormalizer.NormalizeBranchName(source.BranchName);
+                int studyYearId = studyYears[studyYearName].StudyYearID;
+                int? branchId = branchName == null ? null : branches[branchName].BranchID;
 
                 Subject? subject = context.Subjects.FirstOrDefault(s =>
                     s.SubjectName == source.Name &&
@@ -64,7 +68,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
         {
             var result = new Dictionary<string, StudyYear>();
 
-            foreach (string yearName in StudyYearNames)
+            foreach (string yearName in StudyYearNames.Select(ReferenceNameNormalizer.NormalizeStudyYearName).Distinct())
             {
                 StudyYear? studyYear = context.StudyYears.FirstOrDefault(y => y.YearName == yearName);
 
@@ -89,7 +93,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
         {
             var result = new Dictionary<string, Branch>();
 
-            foreach (string branchName in BranchNames)
+            foreach (string branchName in BranchNames.Select(ReferenceNameNormalizer.NormalizeBranchName).Distinct())
             {
                 Branch? branch = context.Branches.FirstOrDefault(b => b.BranchName == branchName);
 

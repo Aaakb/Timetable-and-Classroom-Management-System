@@ -16,7 +16,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
 
         public void AddBranch(string branchName)
         {
-            branchName = branchName.Trim();
+            branchName = ReferenceNameNormalizer.NormalizeBranchName(branchName);
 
             if (string.IsNullOrWhiteSpace(branchName))
             {
@@ -44,7 +44,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
 
         public void UpdateBranch(int branchId, string branchName)
         {
-            branchName = branchName.Trim();
+            branchName = ReferenceNameNormalizer.NormalizeBranchName(branchName);
 
             if (branchId <= 0)
             {
