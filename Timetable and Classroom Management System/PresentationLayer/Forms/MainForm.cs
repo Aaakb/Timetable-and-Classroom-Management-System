@@ -64,7 +64,10 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
         private Guna2DataGridView dgvFacultyMembers = null!;
         private Guna2TextBox txtFacultyName = null!;
-        private Guna2TextBox txtAcademicTitle = null!;
+        private Guna2RadioButton rdoTitleProfessor = null!;
+        private Guna2RadioButton rdoTitleAssistantProfessor = null!;
+        private Guna2RadioButton rdoTitleLecturer = null!;
+        private Guna2RadioButton rdoTitleAssistantLecturer = null!;
         private int selectedFacultyMemberId;
 
         private Guna2DataGridView dgvSubjects = null!;
@@ -350,15 +353,15 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             var page = CreateDataPage("Faculty", "Manage instructors and academic titles.", out var fields, out var buttons, out dgvFacultyMembers);
 
             txtFacultyName = CreateTextBox("Dr. Sara Ahmed");
-            txtAcademicTitle = CreateTextBox("Assistant Professor");
+            Control academicTitleSelector = CreateAcademicTitleSelector();
 
             fields.Controls.Add(CreateField("Full name", txtFacultyName));
-            fields.Controls.Add(CreateField("Academic title", txtAcademicTitle));
+            fields.Controls.Add(CreateField("Academic title", academicTitleSelector, 420));
 
             buttons.Controls.Add(CreateActionButton("Add", SuccessColor, (_, _) =>
-                RunCommand(() => _facultyMemberService.AddFacultyMember(txtFacultyName.Text, NullIfWhiteSpace(txtAcademicTitle.Text)), "Faculty member added successfully.", ClearFacultyInputs)));
+                RunCommand(() => _facultyMemberService.AddFacultyMember(txtFacultyName.Text, SelectedAcademicTitle()), "Faculty member added successfully.", ClearFacultyInputs)));
             buttons.Controls.Add(CreateActionButton("Update", PrimaryColor, (_, _) =>
-                RunCommand(() => _facultyMemberService.UpdateFacultyMember(selectedFacultyMemberId, txtFacultyName.Text, NullIfWhiteSpace(txtAcademicTitle.Text)), "Faculty member updated successfully.", ClearFacultyInputs)));
+                RunCommand(() => _facultyMemberService.UpdateFacultyMember(selectedFacultyMemberId, txtFacultyName.Text, SelectedAcademicTitle()), "Faculty member updated successfully.", ClearFacultyInputs)));
             buttons.Controls.Add(CreateActionButton("Delete", DangerColor, (_, _) =>
                 ConfirmAndRun("Delete selected faculty member?", () => _facultyMemberService.DeleteFacultyMember(selectedFacultyMemberId), "Faculty member deleted successfully.", ClearFacultyInputs)));
             buttons.Controls.Add(CreateActionButton("Clear", MutedColor, (_, _) => ClearFacultyInputs()));
@@ -804,6 +807,47 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             };
         }
 
+        private Control CreateAcademicTitleSelector()
+        {
+            rdoTitleProfessor = CreateAcademicTitleRadio("Professor", false);
+            rdoTitleAssistantProfessor = CreateAcademicTitleRadio("Assistant Professor", true);
+            rdoTitleLecturer = CreateAcademicTitleRadio("Lecturer", false);
+            rdoTitleAssistantLecturer = CreateAcademicTitleRadio("Assistant Lecturer", false);
+
+            var panel = new FlowLayoutPanel
+            {
+                Width = 420,
+                Height = 40,
+                FlowDirection = FlowDirection.LeftToRight,
+                WrapContents = true,
+                BackColor = CardBackground,
+                Padding = new Padding(0)
+            };
+
+            panel.Controls.Add(rdoTitleProfessor);
+            panel.Controls.Add(rdoTitleAssistantProfessor);
+            panel.Controls.Add(rdoTitleLecturer);
+            panel.Controls.Add(rdoTitleAssistantLecturer);
+            return panel;
+        }
+
+        private Guna2RadioButton CreateAcademicTitleRadio(string text, bool isChecked)
+        {
+            return new Guna2RadioButton
+            {
+                Text = text,
+                Width = 180,
+                Height = 18,
+                Checked = isChecked,
+                Font = new Font("Segoe UI", 9F),
+                ForeColor = HeaderColor,
+                BackColor = Color.Transparent,
+                CheckedState = { FillColor = PrimaryColor, BorderColor = PrimaryColor },
+                UncheckedState = { FillColor = CardBackground, BorderColor = BorderColor },
+                Margin = new Padding(0, 0, 12, 2)
+            };
+        }
+
         private Control CreateField(string labelText, Control input, int width = 220)
         {
             input.Width = width;
@@ -1168,7 +1212,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
             selectedFacultyMemberId = GetGridInt(row, "FacultyMemberID");
             txtFacultyName.Text = GetGridText(row, "FullName");
-            txtAcademicTitle.Text = GetGridText(row, "AcademicTitle");
+            SetSelectedAcademicTitle(GetGridText(row, "AcademicTitle"));
         }
 
         private void DgvSubjects_CellClick(object? sender, DataGridViewCellEventArgs e)
@@ -1274,7 +1318,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         {
             selectedFacultyMemberId = 0;
             txtFacultyName.Clear();
-            txtAcademicTitle.Clear();
+            SetSelectedAcademicTitle("Assistant Professor");
             dgvFacultyMembers.ClearSelection();
         }
 
@@ -1396,6 +1440,39 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             bool isLab = string.Equals(roomType?.Trim(), "Lab", StringComparison.OrdinalIgnoreCase);
             rdoRoomLab.Checked = isLab;
             rdoRoomLecture.Checked = !isLab;
+        }
+
+        private string SelectedAcademicTitle()
+        {
+            if (rdoTitleProfessor.Checked)
+            {
+                return "Professor";
+            }
+
+            if (rdoTitleLecturer.Checked)
+            {
+                return "Lecturer";
+            }
+
+            if (rdoTitleAssistantLecturer.Checked)
+            {
+                return "Assistant Lecturer";
+            }
+
+            return "Assistant Professor";
+        }
+
+        private void SetSelectedAcademicTitle(string? academicTitle)
+        {
+            string title = academicTitle?.Trim() ?? string.Empty;
+
+            rdoTitleProfessor.Checked = string.Equals(title, "Professor", StringComparison.OrdinalIgnoreCase);
+            rdoTitleLecturer.Checked = string.Equals(title, "Lecturer", StringComparison.OrdinalIgnoreCase);
+            rdoTitleAssistantLecturer.Checked = string.Equals(title, "Assistant Lecturer", StringComparison.OrdinalIgnoreCase);
+            rdoTitleAssistantProfessor.Checked =
+                string.IsNullOrWhiteSpace(title) ||
+                string.Equals(title, "Assistant Professor", StringComparison.OrdinalIgnoreCase) ||
+                (!rdoTitleProfessor.Checked && !rdoTitleLecturer.Checked && !rdoTitleAssistantLecturer.Checked);
         }
 
         private static string FormatTime(TimeSpan time)
