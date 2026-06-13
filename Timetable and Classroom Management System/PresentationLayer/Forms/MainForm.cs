@@ -58,7 +58,8 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private Guna2DataGridView dgvClassrooms = null!;
         private Guna2TextBox txtClassroomNumber = null!;
         private Guna2NumericUpDown numClassroomCapacity = null!;
-        private Guna2TextBox txtRoomType = null!;
+        private Guna2RadioButton rdoRoomLecture = null!;
+        private Guna2RadioButton rdoRoomLab = null!;
         private int selectedClassroomId;
 
         private Guna2DataGridView dgvFacultyMembers = null!;
@@ -315,7 +316,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 RunCommand(() => _studyYearService.UpdateStudyYear(selectedStudyYearId, txtStudyYearName.Text), "Study year updated successfully.", ClearStudyYearInputs)));
             buttons.Controls.Add(CreateActionButton("Delete", DangerColor, (_, _) =>
                 ConfirmAndRun("Delete selected study year?", () => _studyYearService.DeleteStudyYear(selectedStudyYearId), "Study year deleted successfully.", ClearStudyYearInputs)));
-            buttons.Controls.Add(CreateActionButton("Clear", MutedColor, (_, _) => ClearStudyYearInputs()));
 
             dgvStudyYears.CellClick += DgvStudyYears_CellClick;
             return page;
@@ -327,16 +327,16 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
             txtClassroomNumber = CreateTextBox("A-101");
             numClassroomCapacity = CreateNumber(1, 1000, 30);
-            txtRoomType = CreateTextBox("Lecture / Lab");
+            Control roomTypeSelector = CreateRoomTypeSelector();
 
             fields.Controls.Add(CreateField("Room number", txtClassroomNumber));
             fields.Controls.Add(CreateField("Capacity", numClassroomCapacity, 150));
-            fields.Controls.Add(CreateField("Room type", txtRoomType));
+            fields.Controls.Add(CreateField("Room type", roomTypeSelector));
 
             buttons.Controls.Add(CreateActionButton("Add", SuccessColor, (_, _) =>
-                RunCommand(() => _classroomService.AddClassroom(txtClassroomNumber.Text, (int)numClassroomCapacity.Value, NullIfWhiteSpace(txtRoomType.Text)), "Classroom added successfully.", ClearClassroomInputs)));
+                RunCommand(() => _classroomService.AddClassroom(txtClassroomNumber.Text, (int)numClassroomCapacity.Value, SelectedRoomType()), "Classroom added successfully.", ClearClassroomInputs)));
             buttons.Controls.Add(CreateActionButton("Update", PrimaryColor, (_, _) =>
-                RunCommand(() => _classroomService.UpdateClassroom(selectedClassroomId, txtClassroomNumber.Text, (int)numClassroomCapacity.Value, NullIfWhiteSpace(txtRoomType.Text)), "Classroom updated successfully.", ClearClassroomInputs)));
+                RunCommand(() => _classroomService.UpdateClassroom(selectedClassroomId, txtClassroomNumber.Text, (int)numClassroomCapacity.Value, SelectedRoomType()), "Classroom updated successfully.", ClearClassroomInputs)));
             buttons.Controls.Add(CreateActionButton("Delete", DangerColor, (_, _) =>
                 ConfirmAndRun("Delete selected classroom?", () => _classroomService.DeleteClassroom(selectedClassroomId), "Classroom deleted successfully.", ClearClassroomInputs)));
             buttons.Controls.Add(CreateActionButton("Clear", MutedColor, (_, _) => ClearClassroomInputs()));
@@ -766,6 +766,43 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             };
         }
 
+        private Control CreateRoomTypeSelector()
+        {
+            rdoRoomLecture = CreateRoomTypeRadio("Lecture", true);
+            rdoRoomLab = CreateRoomTypeRadio("Lab", false);
+
+            var panel = new FlowLayoutPanel
+            {
+                Width = 220,
+                Height = 40,
+                FlowDirection = FlowDirection.LeftToRight,
+                WrapContents = false,
+                BackColor = CardBackground,
+                Padding = new Padding(0)
+            };
+
+            panel.Controls.Add(rdoRoomLecture);
+            panel.Controls.Add(rdoRoomLab);
+            return panel;
+        }
+
+        private Guna2RadioButton CreateRoomTypeRadio(string text, bool isChecked)
+        {
+            return new Guna2RadioButton
+            {
+                Text = text,
+                Width = 96,
+                Height = 36,
+                Checked = isChecked,
+                Font = new Font("Segoe UI", 10F),
+                ForeColor = HeaderColor,
+                BackColor = Color.Transparent,
+                CheckedState = { FillColor = PrimaryColor, BorderColor = PrimaryColor },
+                UncheckedState = { FillColor = CardBackground, BorderColor = BorderColor },
+                Margin = new Padding(0, 2, 12, 0)
+            };
+        }
+
         private Control CreateField(string labelText, Control input, int width = 220)
         {
             input.Width = width;
@@ -1118,7 +1155,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             selectedClassroomId = GetGridInt(row, "ClassroomID");
             txtClassroomNumber.Text = GetGridText(row, "ClassroomNumber");
             numClassroomCapacity.Value = GetGridDecimal(row, "Capacity");
-            txtRoomType.Text = GetGridText(row, "RoomType");
+            SetSelectedRoomType(GetGridText(row, "RoomType"));
         }
 
         private void DgvFacultyMembers_CellClick(object? sender, DataGridViewCellEventArgs e)
@@ -1227,8 +1264,8 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         {
             selectedClassroomId = 0;
             txtClassroomNumber.Clear();
-            txtRoomType.Clear();
             numClassroomCapacity.Value = 30;
+            SetSelectedRoomType("Lecture");
             dgvClassrooms.ClearSelection();
         }
 
@@ -1320,6 +1357,18 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private string GetStudyYearName(int studyYearId)
         {
             return _studyYears.FirstOrDefault(y => y.StudyYearID == studyYearId)?.YearName ?? "-";
+        }
+
+        private string SelectedRoomType()
+        {
+            return rdoRoomLab.Checked ? "Lab" : "Lecture";
+        }
+
+        private void SetSelectedRoomType(string? roomType)
+        {
+            bool isLab = string.Equals(roomType?.Trim(), "Lab", StringComparison.OrdinalIgnoreCase);
+            rdoRoomLab.Checked = isLab;
+            rdoRoomLecture.Checked = !isLab;
         }
 
         private static string FormatTime(TimeSpan time)
