@@ -74,6 +74,8 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private Guna2TextBox txtSubjectName = null!;
         private Guna2ComboBox cmbSubjectYear = null!;
         private Guna2ComboBox cmbSubjectBranch = null!;
+        private Guna2ComboBox cmbSubjectFilterYear = null!;
+        private Guna2ComboBox cmbSubjectFilterBranch = null!;
         private Guna2NumericUpDown numSemester = null!;
         private Guna2NumericUpDown numTheoreticalHours = null!;
         private Guna2NumericUpDown numPracticalHours = null!;
@@ -364,7 +366,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 RunCommand(() => _facultyMemberService.UpdateFacultyMember(selectedFacultyMemberId, txtFacultyName.Text, SelectedAcademicTitle()), "Faculty member updated successfully.", ClearFacultyInputs)));
             buttons.Controls.Add(CreateActionButton("Delete", DangerColor, (_, _) =>
                 ConfirmAndRun("Delete selected faculty member?", () => _facultyMemberService.DeleteFacultyMember(selectedFacultyMemberId), "Faculty member deleted successfully.", ClearFacultyInputs)));
-            buttons.Controls.Add(CreateActionButton("Clear", MutedColor, (_, _) => ClearFacultyInputs()));
 
             dgvFacultyMembers.CellClick += DgvFacultyMembers_CellClick;
             return page;
@@ -377,6 +378,12 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             txtSubjectName = CreateTextBox("Algorithms");
             cmbSubjectYear = CreateCombo();
             cmbSubjectBranch = CreateCombo();
+            cmbSubjectFilterYear = CreateCombo();
+            cmbSubjectFilterYear.Width = 170;
+            cmbSubjectFilterYear.Margin = new Padding(0, 6, 10, 0);
+            cmbSubjectFilterBranch = CreateCombo();
+            cmbSubjectFilterBranch.Width = 170;
+            cmbSubjectFilterBranch.Margin = new Padding(0, 6, 10, 0);
             numSemester = CreateNumber(1, 2, 1);
             numTheoreticalHours = CreateNumber(0, 20, 2);
             numPracticalHours = CreateNumber(0, 20, 0);
@@ -392,6 +399,10 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             fields.Controls.Add(CreateField("Credit units", numCreditUnits, 150));
             fields.Controls.Add(CreateField("Requirement", txtRequirementType));
 
+            cmbSubjectFilterYear.SelectedIndexChanged += (_, _) => BindSubjectsGrid();
+            cmbSubjectFilterBranch.SelectedIndexChanged += (_, _) => BindSubjectsGrid();
+            buttons.Controls.Add(cmbSubjectFilterYear);
+            buttons.Controls.Add(cmbSubjectFilterBranch);
             buttons.Controls.Add(CreateActionButton("Add", SuccessColor, (_, _) =>
                 RunCommand(() => _subjectService.AddSubject(txtSubjectName.Text, SelectedId(cmbSubjectYear), (int)numSemester.Value, (int)numTheoreticalHours.Value, (int)numPracticalHours.Value, (int)numCreditUnits.Value, txtRequirementType.Text, SelectedOptionalId(cmbSubjectBranch)), "Subject added successfully.", ClearSubjectInputs)));
             buttons.Controls.Add(CreateActionButton("Update", PrimaryColor, (_, _) =>
@@ -933,6 +944,8 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         {
             SetComboItems(cmbSubjectYear, _studyYears.Select(y => new LookupItem(y.StudyYearID, y.YearName)), false);
             SetComboItems(cmbSubjectBranch, _branches.Select(b => new LookupItem(b.BranchID, b.BranchName)), true);
+            SetComboItems(cmbSubjectFilterYear, _studyYears.Select(y => new LookupItem(y.StudyYearID, y.YearName)), true, "All study years");
+            SetComboItems(cmbSubjectFilterBranch, _branches.Select(b => new LookupItem(b.BranchID, b.BranchName)), true, "All branches");
 
             SetComboItems(cmbSectionYear, _studyYears.Select(y => new LookupItem(y.StudyYearID, y.YearName)), false);
             SetComboItems(cmbSectionBranch, _branches.Select(b => new LookupItem(b.BranchID, b.BranchName)), true);
@@ -976,24 +989,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 .ToList();
             FinishGrid(dgvFacultyMembers, "FacultyMemberID");
 
-            dgvSubjects.DataSource = _subjects
-                .Select((s, index) => new
-                {
-                    No = index + 1,
-                    s.SubjectID,
-                    s.SubjectName,
-                    s.StudyYearID,
-                    StudyYear = GetStudyYearName(s.StudyYearID),
-                    s.SemesterNumber,
-                    s.TheoreticalHours,
-                    s.PracticalHours,
-                    s.CreditUnits,
-                    s.RequirementType,
-                    s.BranchID,
-                    Branch = GetBranchName(s.BranchID)
-                })
-                .ToList();
-            FinishGrid(dgvSubjects, "SubjectID", "StudyYearID", "BranchID");
+            BindSubjectsGrid();
 
             dgvSections.DataSource = _sections
                 .Select((s, index) => new
@@ -1057,6 +1053,43 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 })
                 .ToList();
             FinishGrid(dgvSchedules, "ScheduleID", "SubjectID", "FacultyMemberID", "ClassroomID", "TimeSlotID", "StudyYearID", "BranchID", "SectionID");
+        }
+
+        private void BindSubjectsGrid()
+        {
+            int studyYearId = SelectedId(cmbSubjectFilterYear);
+            int branchId = SelectedId(cmbSubjectFilterBranch);
+
+            IEnumerable<Subject> subjects = _subjects;
+
+            if (studyYearId > 0)
+            {
+                subjects = subjects.Where(s => s.StudyYearID == studyYearId);
+            }
+
+            if (branchId > 0)
+            {
+                subjects = subjects.Where(s => s.BranchID == branchId);
+            }
+
+            dgvSubjects.DataSource = subjects
+                .Select((s, index) => new
+                {
+                    No = index + 1,
+                    s.SubjectID,
+                    s.SubjectName,
+                    s.StudyYearID,
+                    StudyYear = GetStudyYearName(s.StudyYearID),
+                    s.SemesterNumber,
+                    s.TheoreticalHours,
+                    s.PracticalHours,
+                    s.CreditUnits,
+                    s.RequirementType,
+                    s.BranchID,
+                    Branch = GetBranchName(s.BranchID)
+                })
+                .ToList();
+            FinishGrid(dgvSubjects, "SubjectID", "StudyYearID", "BranchID");
         }
 
         private void UpdateDashboard()
