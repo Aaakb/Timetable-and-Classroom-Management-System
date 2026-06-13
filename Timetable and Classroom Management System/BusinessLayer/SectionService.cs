@@ -64,6 +64,8 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
                 }
             }
 
+            ValidateStudyYearBranch(context, studyYearId, branchId);
+
             bool sectionExists = context.Sections
                 .Any(s =>
                     s.SectionName == sectionName &&
@@ -145,6 +147,8 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
                 }
             }
 
+            ValidateStudyYearBranch(context, studyYearId, branchId);
+
             bool sectionExists = context.Sections
                 .Any(s =>
                     s.SectionName == sectionName &&
@@ -192,6 +196,40 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
 
             context.Sections.Remove(section);
             context.SaveChanges();
+        }
+
+        private static void ValidateStudyYearBranch(AppDbContext context, int studyYearId, int? branchId)
+        {
+            List<int> validBranchIds = context.Subjects
+                .Where(s => s.StudyYearID == studyYearId && s.BranchID.HasValue)
+                .Select(s => s.BranchID!.Value)
+                .Distinct()
+                .ToList();
+
+            if (validBranchIds.Count == 0)
+            {
+                if (branchId.HasValue)
+                {
+                    throw new Exception("This study year does not have branch-specific subjects. Choose None for the branch.");
+                }
+
+                return;
+            }
+
+            if (!branchId.HasValue)
+            {
+                throw new Exception("Please select a branch that belongs to this study year.");
+            }
+
+            if (!validBranchIds.Contains(branchId.Value))
+            {
+                string studyYearName = context.StudyYears
+                    .Where(y => y.StudyYearID == studyYearId)
+                    .Select(y => y.YearName)
+                    .FirstOrDefault() ?? "the selected study year";
+
+                throw new Exception($"Selected branch is not available for {studyYearName}.");
+            }
         }
     }
 }

@@ -425,6 +425,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             cmbSectionYear = CreateCombo();
             cmbSectionBranch = CreateCombo();
             numStudentCount = CreateNumber(1, 1000, 30);
+            cmbSectionYear.SelectedIndexChanged += (_, _) => RefreshSectionBranchOptions();
 
             fields.Controls.Add(CreateField("Section name", txtSectionName));
             fields.Controls.Add(CreateField("Study year", cmbSectionYear));
@@ -437,7 +438,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 RunCommand(() => _sectionService.UpdateSection(selectedSectionId, txtSectionName.Text, SelectedId(cmbSectionYear), SelectedOptionalId(cmbSectionBranch), (int)numStudentCount.Value), "Section updated successfully.", ClearSectionInputs)));
             buttons.Controls.Add(CreateActionButton("Delete", DangerColor, (_, _) =>
                 ConfirmAndRun("Delete selected section?", () => _sectionService.DeleteSection(selectedSectionId), "Section deleted successfully.", ClearSectionInputs)));
-            buttons.Controls.Add(CreateActionButton("Clear", MutedColor, (_, _) => ClearSectionInputs()));
 
             dgvSections.CellClick += DgvSections_CellClick;
             return page;
@@ -453,12 +453,12 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             {
                 Text = "Break period",
                 AutoSize = true,
-                Font = new Font("Segoe UI", 10F),
+                Font = new Font("Segoe UI", 12F, FontStyle.Bold),
                 ForeColor = HeaderColor,
                 BackColor = Color.Transparent,
                 CheckedState = { FillColor = PrimaryColor, BorderColor = PrimaryColor },
                 UncheckedState = { FillColor = CardBackground, BorderColor = BorderColor },
-                Margin = new Padding(0, 27, 16, 8)
+                Margin = new Padding(0, 24, 16, 8)
             };
 
             fields.Controls.Add(CreateField("Start time", txtStartTime));
@@ -880,7 +880,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             }, false);
 
             SetComboItems(cmbSectionYear, _studyYears.Select(y => new LookupItem(y.StudyYearID, y.YearName)), false);
-            SetComboItems(cmbSectionBranch, _branches.Select(b => new LookupItem(b.BranchID, b.BranchName)), true);
+            RefreshSectionBranchOptions();
 
             SetComboItems(cmbAssignFaculty, _facultyMembers.Select(f => new LookupItem(f.FacultyMemberID, f.FullName)), false);
             SetComboItems(cmbAssignSubject, _subjects.Select(s => new LookupItem(s.SubjectID, s.SubjectName)), false);
@@ -888,7 +888,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             SetComboItems(cmbScheduleSubject, _subjects.Select(s => new LookupItem(s.SubjectID, s.SubjectName)), true, "Select subject");
             SetComboItems(cmbScheduleFaculty, _facultyMembers.Select(f => new LookupItem(f.FacultyMemberID, f.FullName)), true, "Select faculty");
             SetComboItems(cmbScheduleClassroom, _classrooms.Select(c => new LookupItem(c.ClassroomID, $"{c.ClassroomNumber} ({c.Capacity})")), true, "Select classroom");
-            SetComboItems(cmbScheduleTimeSlot, _timeSlots.Select(t => new LookupItem(t.TimeSlotID, $"{FormatTime(t.StartTime)} - {FormatTime(t.EndTime)}{(t.IsBreak ? " Break" : string.Empty)}")), true, "Select time slot");
+            SetComboItems(cmbScheduleTimeSlot, _timeSlots.Where(t => !t.IsBreak).Select(t => new LookupItem(t.TimeSlotID, $"{FormatTime(t.StartTime)} - {FormatTime(t.EndTime)}")), true, "Select time slot");
             SetComboItems(cmbScheduleYear, _studyYears.Select(y => new LookupItem(y.StudyYearID, y.YearName)), true, "Select study year");
             SetComboItems(cmbScheduleBranch, _branches.Select(b => new LookupItem(b.BranchID, b.BranchName)), true);
             SetComboItems(cmbScheduleSection, _sections.Select(s => new LookupItem(s.SectionID, $"{s.SectionName} ({GetStudyYearName(s.StudyYearID)})")), true, "Select section");
@@ -897,6 +897,38 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             {
                 cmbScheduleDay.SelectedIndex = 0;
             }
+        }
+
+        private void RefreshSectionBranchOptions(int preferredBranchId = 0)
+        {
+            int studyYearId = SelectedId(cmbSectionYear);
+            List<LookupItem> branchItems = GetSectionBranchItems(studyYearId).ToList();
+            bool hasBranchOptions = branchItems.Count > 0;
+
+            SetComboItems(cmbSectionBranch, branchItems, true, hasBranchOptions ? "Select branch" : "None");
+            cmbSectionBranch.Enabled = hasBranchOptions;
+
+            if (preferredBranchId > 0)
+            {
+                SetComboValue(cmbSectionBranch, preferredBranchId);
+            }
+        }
+
+        private IEnumerable<LookupItem> GetSectionBranchItems(int studyYearId)
+        {
+            if (studyYearId <= 0)
+            {
+                return Enumerable.Empty<LookupItem>();
+            }
+
+            HashSet<int> validBranchIds = _subjects
+                .Where(s => s.StudyYearID == studyYearId && s.BranchID.HasValue)
+                .Select(s => s.BranchID!.Value)
+                .ToHashSet();
+
+            return _branches
+                .Where(b => validBranchIds.Contains(b.BranchID))
+                .Select(b => new LookupItem(b.BranchID, b.BranchName));
         }
 
         private void BindGrids()
@@ -931,7 +963,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                     s.SectionName,
                     s.StudentCount,
                     s.StudyYearID,
-                    StudyYear = GetStudyYearName(s.StudyYearID),
                     s.BranchID,
                     Branch = GetBranchName(s.BranchID)
                 })
@@ -945,10 +976,13 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                     t.TimeSlotID,
                     StartTime = FormatTime(t.StartTime),
                     EndTime = FormatTime(t.EndTime),
+                    Duration = FormatDuration(t.EndTime - t.StartTime),
+                    Type = t.IsBreak ? "Break Period" : "Teaching Period",
                     t.IsBreak
                 })
                 .ToList();
-            FinishGrid(dgvTimeSlots, "TimeSlotID");
+            FinishGrid(dgvTimeSlots, "TimeSlotID", "IsBreak");
+            StyleTimeSlotRows();
 
             dgvAssignments.DataSource = _assignments
                 .Select((a, index) => new
@@ -985,6 +1019,33 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 })
                 .ToList();
             FinishGrid(dgvSchedules, "ScheduleID", "SubjectID", "FacultyMemberID", "ClassroomID", "TimeSlotID", "StudyYearID", "BranchID", "SectionID");
+        }
+
+        private void StyleTimeSlotRows()
+        {
+            if (dgvTimeSlots.Columns.Contains("Type"))
+            {
+                dgvTimeSlots.Columns["Type"].FillWeight = 145;
+            }
+
+            if (dgvTimeSlots.Columns.Contains("Duration"))
+            {
+                dgvTimeSlots.Columns["Duration"].FillWeight = 95;
+            }
+
+            foreach (DataGridViewRow row in dgvTimeSlots.Rows)
+            {
+                if (!GetGridBool(row, "IsBreak"))
+                {
+                    continue;
+                }
+
+                row.DefaultCellStyle.BackColor = Color.FromArgb(239, 253, 244);
+                row.DefaultCellStyle.ForeColor = Color.FromArgb(22, 101, 52);
+                row.DefaultCellStyle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+                row.DefaultCellStyle.SelectionBackColor = Color.FromArgb(187, 247, 208);
+                row.DefaultCellStyle.SelectionForeColor = Color.FromArgb(20, 83, 45);
+            }
         }
 
         private void BindSubjectsGrid()
@@ -1213,7 +1274,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             txtSectionName.Text = GetGridText(row, "SectionName");
             numStudentCount.Value = GetGridDecimal(row, "StudentCount");
             SetComboValue(cmbSectionYear, GetGridInt(row, "StudyYearID"));
-            SetComboValue(cmbSectionBranch, GetGridNullableInt(row, "BranchID") ?? 0);
+            RefreshSectionBranchOptions(GetGridNullableInt(row, "BranchID") ?? 0);
         }
 
         private void DgvTimeSlots_CellClick(object? sender, DataGridViewCellEventArgs e)
@@ -1461,6 +1522,19 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             return time.ToString(@"hh\:mm", CultureInfo.InvariantCulture);
         }
 
+        private static string FormatDuration(TimeSpan duration)
+        {
+            if (duration.TotalMinutes < 60)
+            {
+                return $"{(int)duration.TotalMinutes} min";
+            }
+
+            int hours = (int)duration.TotalHours;
+            int minutes = duration.Minutes;
+
+            return minutes == 0 ? $"{hours} h" : $"{hours} h {minutes} min";
+        }
+
         private static TimeSpan ReadTime(Guna2TextBox textBox, string label)
         {
             string value = textBox.Text.Trim();
@@ -1513,6 +1587,8 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             SetHeader(grid, "StudentCount", "Students");
             SetHeader(grid, "StartTime", "Start Time");
             SetHeader(grid, "EndTime", "End Time");
+            SetHeader(grid, "Duration", "Duration");
+            SetHeader(grid, "Type", "Type");
             SetHeader(grid, "IsBreak", "Break");
             SetHeader(grid, "DayOfWeek", "Day");
         }
