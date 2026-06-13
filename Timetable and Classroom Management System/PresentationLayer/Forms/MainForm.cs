@@ -1,6 +1,7 @@
 using System.Globalization;
 using Guna.UI2.WinForms;
 using Timetable_and_Classroom_Management_System.BusinessLayer;
+using Timetable_and_Classroom_Management_System.DataAccessLayer;
 using Timetable_and_Classroom_Management_System.Models;
 
 namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
@@ -545,7 +546,11 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             cmbScheduleFilterDay.SelectedIndex = 0;
             cmbScheduleFilterFaculty.SelectedIndexChanged += (_, _) => BindSchedulesGrid();
             cmbScheduleFilterSection.SelectedIndexChanged += (_, _) => BindSchedulesGrid();
-            cmbScheduleFilterYear.SelectedIndexChanged += (_, _) => BindSchedulesGrid();
+            cmbScheduleFilterYear.SelectedIndexChanged += (_, _) =>
+            {
+                RefreshScheduleFilterSectionOptions();
+                BindSchedulesGrid();
+            };
             cmbScheduleFilterDay.SelectedIndexChanged += (_, _) => BindSchedulesGrid();
 
             fields.Controls.Add(CreateField("Subject", cmbScheduleSubject));
@@ -965,8 +970,8 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             SetComboItems(cmbScheduleBranch, _branches.Select(b => new LookupItem(b.BranchID, b.BranchName)), true);
             SetComboItems(cmbScheduleSection, _sections.Select(s => new LookupItem(s.SectionID, FormatSectionDisplayName(s))), true, "Select section");
             SetComboItems(cmbScheduleFilterFaculty, _facultyMembers.Select(f => new LookupItem(f.FacultyMemberID, f.FullName)), true, "All faculty");
-            SetComboItems(cmbScheduleFilterSection, _sections.Select(s => new LookupItem(s.SectionID, FormatSectionDisplayName(s))), true, "All sections");
             SetComboItems(cmbScheduleFilterYear, _studyYears.Select(y => new LookupItem(y.StudyYearID, y.YearName)), true, "All study years");
+            RefreshScheduleFilterSectionOptions();
 
             if (cmbScheduleDay.Items.Count > 0 && cmbScheduleDay.SelectedIndex < 0)
             {
@@ -1004,6 +1009,39 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             return _branches
                 .Where(b => validBranchIds.Contains(b.BranchID))
                 .Select(b => new LookupItem(b.BranchID, b.BranchName));
+        }
+
+        private void RefreshScheduleFilterSectionOptions()
+        {
+            int selectedStudyYearId = SelectedId(cmbScheduleFilterYear);
+            List<Section> filterSections = _sections
+                .Where(s => IsFirstOrSecondStudyYear(s.StudyYearID))
+                .ToList();
+
+            if (selectedStudyYearId > 0)
+            {
+                filterSections = filterSections
+                    .Where(s => s.StudyYearID == selectedStudyYearId)
+                    .ToList();
+            }
+
+            bool canUseSectionFilter = selectedStudyYearId <= 0 || IsFirstOrSecondStudyYear(selectedStudyYearId);
+            string emptyLabel = canUseSectionFilter ? "All first/second sections" : "First/Second only";
+
+            SetComboItems(cmbScheduleFilterSection, filterSections.Select(s => new LookupItem(s.SectionID, FormatSectionDisplayName(s))), true, emptyLabel);
+            cmbScheduleFilterSection.Enabled = canUseSectionFilter;
+        }
+
+        private bool IsFirstOrSecondStudyYear(int studyYearId)
+        {
+            if (studyYearId <= 0)
+            {
+                return false;
+            }
+
+            string yearName = ReferenceNameNormalizer.NormalizeStudyYearName(GetStudyYearName(studyYearId));
+            return yearName == ReferenceNameNormalizer.FirstYear ||
+                yearName == ReferenceNameNormalizer.SecondYear;
         }
 
         private void BindGrids()
