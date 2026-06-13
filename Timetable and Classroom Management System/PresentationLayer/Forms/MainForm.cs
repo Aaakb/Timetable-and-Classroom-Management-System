@@ -48,22 +48,8 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
         private int selectedClassroomId;
 
-        private Guna2DataGridView dgvFacultyMembers = null!;
-        private Guna2TextBox txtFacultyName = null!;
-        private Guna2ComboBox cmbAcademicTitle = null!;
         private int selectedFacultyMemberId;
 
-        private Guna2DataGridView dgvSubjects = null!;
-        private Guna2TextBox txtSubjectName = null!;
-        private Guna2ComboBox cmbSubjectYear = null!;
-        private Guna2ComboBox cmbSubjectBranch = null!;
-        private Guna2ComboBox cmbSubjectFilterYear = null!;
-        private Guna2ComboBox cmbSubjectFilterBranch = null!;
-        private Guna2ComboBox cmbSubjectFilterSemester = null!;
-        private Guna2NumericUpDown numSemester = null!;
-        private Guna2NumericUpDown numTheoreticalHours = null!;
-        private Guna2NumericUpDown numPracticalHours = null!;
-        private Guna2NumericUpDown numCreditUnits = null!;
         private int selectedSubjectId;
 
         private Guna2DataGridView dgvSections = null!;
@@ -118,8 +104,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             BackColor = AppBackground;
             WireDesignerPages();
 
-            mainTabs.Controls.Add(CreateFacultyPage());
-            mainTabs.Controls.Add(CreateSubjectsPage());
             mainTabs.Controls.Add(CreateSectionsPage());
             mainTabs.Controls.Add(CreateTimeSlotsPage());
             mainTabs.Controls.Add(CreateAssignmentsPage());
@@ -154,6 +138,25 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             btnClassroomDelete.Click += (_, _) =>
                 ConfirmAndRun("Delete selected classroom?", () => _classroomService.DeleteClassroom(selectedClassroomId), "Classroom deleted successfully.", ClearClassroomInputs);
             dgvClassrooms.CellClick += DgvClassrooms_CellClick;
+
+            btnFacultyAdd.Click += (_, _) =>
+                RunCommand(() => _facultyMemberService.AddFacultyMember(txtFacultyName.Text, SelectedAcademicTitle()), "Faculty member added successfully.", ClearFacultyInputs);
+            btnFacultyUpdate.Click += (_, _) =>
+                RunCommand(() => _facultyMemberService.UpdateFacultyMember(selectedFacultyMemberId, txtFacultyName.Text, SelectedAcademicTitle()), "Faculty member updated successfully.", ClearFacultyInputs);
+            btnFacultyDelete.Click += (_, _) =>
+                ConfirmAndRun("Delete selected faculty member?", () => _facultyMemberService.DeleteFacultyMember(selectedFacultyMemberId), "Faculty member deleted successfully.", ClearFacultyInputs);
+            dgvFacultyMembers.CellClick += DgvFacultyMembers_CellClick;
+
+            cmbSubjectFilterYear.SelectedIndexChanged += (_, _) => BindSubjectsGrid();
+            cmbSubjectFilterBranch.SelectedIndexChanged += (_, _) => BindSubjectsGrid();
+            cmbSubjectFilterSemester.SelectedIndexChanged += (_, _) => BindSubjectsGrid();
+            btnSubjectAdd.Click += (_, _) =>
+                RunCommand(() => _subjectService.AddSubject(txtSubjectName.Text, SelectedId(cmbSubjectYear), (int)numSemester.Value, (double)numTheoreticalHours.Value, (double)numPracticalHours.Value, (double)numCreditUnits.Value, SelectedOptionalId(cmbSubjectBranch)), "Subject added successfully.", ClearSubjectInputs);
+            btnSubjectUpdate.Click += (_, _) =>
+                RunCommand(() => _subjectService.UpdateSubject(selectedSubjectId, txtSubjectName.Text, SelectedId(cmbSubjectYear), (int)numSemester.Value, (double)numTheoreticalHours.Value, (double)numPracticalHours.Value, (double)numCreditUnits.Value, SelectedOptionalId(cmbSubjectBranch)), "Subject updated successfully.", ClearSubjectInputs);
+            btnSubjectDelete.Click += (_, _) =>
+                ConfirmAndRun("Delete selected subject?", () => _subjectService.DeleteSubject(selectedSubjectId), "Subject deleted successfully.", ClearSubjectInputs);
+            dgvSubjects.CellClick += DgvSubjects_CellClick;
         }
 
         private Control CreateHeader()
@@ -2161,6 +2164,16 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         }
 
         private void MainForm_Load_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblAppTitle_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblAppSubtitle_Click(object sender, EventArgs e)
         {
 
         }

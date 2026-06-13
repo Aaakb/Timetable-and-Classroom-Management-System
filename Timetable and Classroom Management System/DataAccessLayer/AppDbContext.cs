@@ -1,10 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
 using Timetable_and_Classroom_Management_System.Models;
 
 namespace Timetable_and_Classroom_Management_System.DataAccessLayer

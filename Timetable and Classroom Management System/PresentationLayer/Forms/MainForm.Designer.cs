@@ -48,6 +48,36 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private Guna.UI2.WinForms.Guna2Button btnClassroomUpdate;
         private Guna.UI2.WinForms.Guna2Button btnClassroomDelete;
         private Guna.UI2.WinForms.Guna2DataGridView dgvClassrooms;
+        private TabPage tabFaculty;
+        private TableLayoutPanel facultyLayout;
+        private Guna.UI2.WinForms.Guna2Panel facultyFormCard;
+        private FlowLayoutPanel facultyFieldsPanel;
+        private FlowLayoutPanel facultyButtonsPanel;
+        private Guna.UI2.WinForms.Guna2TextBox txtFacultyName;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbAcademicTitle;
+        private Guna.UI2.WinForms.Guna2Button btnFacultyAdd;
+        private Guna.UI2.WinForms.Guna2Button btnFacultyUpdate;
+        private Guna.UI2.WinForms.Guna2Button btnFacultyDelete;
+        private Guna.UI2.WinForms.Guna2DataGridView dgvFacultyMembers;
+        private TabPage tabSubjects;
+        private TableLayoutPanel subjectsLayout;
+        private Guna.UI2.WinForms.Guna2Panel subjectsFormCard;
+        private FlowLayoutPanel subjectsFieldsPanel;
+        private FlowLayoutPanel subjectsButtonsPanel;
+        private Guna.UI2.WinForms.Guna2TextBox txtSubjectName;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbSubjectYear;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbSubjectBranch;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbSubjectFilterYear;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbSubjectFilterBranch;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbSubjectFilterSemester;
+        private Guna.UI2.WinForms.Guna2NumericUpDown numSemester;
+        private Guna.UI2.WinForms.Guna2NumericUpDown numTheoreticalHours;
+        private Guna.UI2.WinForms.Guna2NumericUpDown numPracticalHours;
+        private Guna.UI2.WinForms.Guna2NumericUpDown numCreditUnits;
+        private Guna.UI2.WinForms.Guna2Button btnSubjectAdd;
+        private Guna.UI2.WinForms.Guna2Button btnSubjectUpdate;
+        private Guna.UI2.WinForms.Guna2Button btnSubjectDelete;
+        private Guna.UI2.WinForms.Guna2DataGridView dgvSubjects;
 
         protected override void Dispose(bool disposing)
         {
@@ -61,6 +91,52 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
         private void InitializeComponent()
         {
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges3 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges4 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges1 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges2 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges5 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges6 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges7 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges8 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges9 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges10 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges11 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges12 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges13 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges14 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges15 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges16 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges17 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges18 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges19 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges20 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges21 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges22 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges23 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges24 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges25 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges26 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges27 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges28 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges29 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges30 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges31 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges32 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges33 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges34 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges35 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges36 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges37 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges38 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges39 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges40 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
             rootLayout = new TableLayoutPanel();
             headerPanel = new Guna.UI2.WinForms.Guna2Panel();
             lblAppTitle = new Label();
@@ -71,6 +147,10 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             dashboardContentPanel = new FlowLayoutPanel();
             tabBranches = new TabPage();
             branchesLayout = new TableLayoutPanel();
+            tabStudyYears = new TabPage();
+            studyYearsLayout = new TableLayoutPanel();
+            tabClassrooms = new TabPage();
+            classroomsLayout = new TableLayoutPanel();
             branchesFormCard = new Guna.UI2.WinForms.Guna2Panel();
             branchesFieldsPanel = new FlowLayoutPanel();
             branchesButtonsPanel = new FlowLayoutPanel();
@@ -80,8 +160,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             btnBranchDelete = new Guna.UI2.WinForms.Guna2Button();
             btnBranchClear = new Guna.UI2.WinForms.Guna2Button();
             dgvBranches = new Guna.UI2.WinForms.Guna2DataGridView();
-            tabStudyYears = new TabPage();
-            studyYearsLayout = new TableLayoutPanel();
             studyYearsFormCard = new Guna.UI2.WinForms.Guna2Panel();
             studyYearsFieldsPanel = new FlowLayoutPanel();
             studyYearsButtonsPanel = new FlowLayoutPanel();
@@ -90,8 +168,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             btnStudyYearUpdate = new Guna.UI2.WinForms.Guna2Button();
             btnStudyYearDelete = new Guna.UI2.WinForms.Guna2Button();
             dgvStudyYears = new Guna.UI2.WinForms.Guna2DataGridView();
-            tabClassrooms = new TabPage();
-            classroomsLayout = new TableLayoutPanel();
             classroomsFormCard = new Guna.UI2.WinForms.Guna2Panel();
             classroomsFieldsPanel = new FlowLayoutPanel();
             classroomsButtonsPanel = new FlowLayoutPanel();
@@ -102,29 +178,59 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             btnClassroomUpdate = new Guna.UI2.WinForms.Guna2Button();
             btnClassroomDelete = new Guna.UI2.WinForms.Guna2Button();
             dgvClassrooms = new Guna.UI2.WinForms.Guna2DataGridView();
+            tabFaculty = new TabPage();
+            facultyLayout = new TableLayoutPanel();
+            facultyFormCard = new Guna.UI2.WinForms.Guna2Panel();
+            facultyFieldsPanel = new FlowLayoutPanel();
+            facultyButtonsPanel = new FlowLayoutPanel();
+            txtFacultyName = new Guna.UI2.WinForms.Guna2TextBox();
+            cmbAcademicTitle = new Guna.UI2.WinForms.Guna2ComboBox();
+            btnFacultyAdd = new Guna.UI2.WinForms.Guna2Button();
+            btnFacultyUpdate = new Guna.UI2.WinForms.Guna2Button();
+            btnFacultyDelete = new Guna.UI2.WinForms.Guna2Button();
+            dgvFacultyMembers = new Guna.UI2.WinForms.Guna2DataGridView();
+            tabSubjects = new TabPage();
+            subjectsLayout = new TableLayoutPanel();
+            subjectsFormCard = new Guna.UI2.WinForms.Guna2Panel();
+            subjectsFieldsPanel = new FlowLayoutPanel();
+            subjectsButtonsPanel = new FlowLayoutPanel();
+            txtSubjectName = new Guna.UI2.WinForms.Guna2TextBox();
+            cmbSubjectYear = new Guna.UI2.WinForms.Guna2ComboBox();
+            cmbSubjectBranch = new Guna.UI2.WinForms.Guna2ComboBox();
+            cmbSubjectFilterYear = new Guna.UI2.WinForms.Guna2ComboBox();
+            cmbSubjectFilterBranch = new Guna.UI2.WinForms.Guna2ComboBox();
+            cmbSubjectFilterSemester = new Guna.UI2.WinForms.Guna2ComboBox();
+            numSemester = new Guna.UI2.WinForms.Guna2NumericUpDown();
+            numTheoreticalHours = new Guna.UI2.WinForms.Guna2NumericUpDown();
+            numPracticalHours = new Guna.UI2.WinForms.Guna2NumericUpDown();
+            numCreditUnits = new Guna.UI2.WinForms.Guna2NumericUpDown();
+            btnSubjectAdd = new Guna.UI2.WinForms.Guna2Button();
+            btnSubjectUpdate = new Guna.UI2.WinForms.Guna2Button();
+            btnSubjectDelete = new Guna.UI2.WinForms.Guna2Button();
+            dgvSubjects = new Guna.UI2.WinForms.Guna2DataGridView();
             rootLayout.SuspendLayout();
             headerPanel.SuspendLayout();
             mainTabs.SuspendLayout();
             tabDashboard.SuspendLayout();
             tabBranches.SuspendLayout();
-            branchesLayout.SuspendLayout();
-            branchesFormCard.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dgvBranches).BeginInit();
             tabStudyYears.SuspendLayout();
-            studyYearsLayout.SuspendLayout();
-            studyYearsFormCard.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dgvStudyYears).BeginInit();
             tabClassrooms.SuspendLayout();
-            classroomsLayout.SuspendLayout();
-            classroomsFormCard.SuspendLayout();
+            tabFaculty.SuspendLayout();
+            tabSubjects.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvBranches).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)dgvStudyYears).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numClassroomCapacity).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgvClassrooms).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)dgvFacultyMembers).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numSemester).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numTheoreticalHours).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numPracticalHours).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numCreditUnits).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)dgvSubjects).BeginInit();
             SuspendLayout();
-
             //
             // rootLayout
             //
-            rootLayout.BackColor = AppBackground;
             rootLayout.ColumnCount = 1;
             rootLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             rootLayout.Controls.Add(headerPanel, 0, 0);
@@ -138,73 +244,72 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             rootLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             rootLayout.Size = new Size(1280, 820);
             rootLayout.TabIndex = 0;
-
             //
             // headerPanel
             //
-            headerPanel.BorderColor = BorderColor;
             headerPanel.BorderRadius = 14;
             headerPanel.BorderThickness = 1;
             headerPanel.Controls.Add(lblAppTitle);
             headerPanel.Controls.Add(lblAppSubtitle);
             headerPanel.Controls.Add(btnRefresh);
+            headerPanel.CustomizableEdges = customizableEdges3;
             headerPanel.Dock = DockStyle.Fill;
-            headerPanel.FillColor = CardBackground;
             headerPanel.Location = new Point(16, 16);
             headerPanel.Margin = new Padding(0, 0, 0, 12);
             headerPanel.Name = "headerPanel";
             headerPanel.Padding = new Padding(24, 14, 24, 14);
+            headerPanel.ShadowDecoration.CustomizableEdges = customizableEdges4;
             headerPanel.Size = new Size(1248, 80);
             headerPanel.TabIndex = 0;
-
             //
             // lblAppTitle
             //
             lblAppTitle.AutoSize = true;
             lblAppTitle.BackColor = Color.Transparent;
             lblAppTitle.Font = new Font("Segoe UI", 22F, FontStyle.Bold);
-            lblAppTitle.ForeColor = HeaderColor;
             lblAppTitle.Location = new Point(24, 12);
             lblAppTitle.Name = "lblAppTitle";
-            lblAppTitle.Size = new Size(271, 50);
+            lblAppTitle.Size = new Size(260, 41);
             lblAppTitle.TabIndex = 0;
             lblAppTitle.Text = "Timetable Studio";
-
+            lblAppTitle.Click += lblAppTitle_Click;
             //
             // lblAppSubtitle
             //
             lblAppSubtitle.AutoSize = true;
             lblAppSubtitle.BackColor = Color.Transparent;
             lblAppSubtitle.Font = new Font("Segoe UI", 10F);
-            lblAppSubtitle.ForeColor = MutedColor;
             lblAppSubtitle.Location = new Point(28, 54);
             lblAppSubtitle.Name = "lblAppSubtitle";
-            lblAppSubtitle.Size = new Size(481, 23);
+            lblAppSubtitle.Size = new Size(392, 19);
             lblAppSubtitle.TabIndex = 1;
             lblAppSubtitle.Text = "Modern classroom, subject, faculty, and schedule management";
-
+            lblAppSubtitle.Click += lblAppSubtitle_Click;
             //
             // btnRefresh
             //
             btnRefresh.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnRefresh.BorderRadius = 9;
-            btnRefresh.FillColor = PrimaryColor;
+            btnRefresh.CustomizableEdges = customizableEdges1;
             btnRefresh.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             btnRefresh.ForeColor = Color.White;
             btnRefresh.Location = new Point(1108, 22);
             btnRefresh.Margin = new Padding(0);
             btnRefresh.Name = "btnRefresh";
+            btnRefresh.ShadowDecoration.CustomizableEdges = customizableEdges2;
             btnRefresh.Size = new Size(116, 40);
             btnRefresh.TabIndex = 2;
             btnRefresh.Text = "Refresh";
-
             //
             // mainTabs
             //
+            mainTabs.Alignment = TabAlignment.Left;
             mainTabs.Controls.Add(tabDashboard);
             mainTabs.Controls.Add(tabBranches);
             mainTabs.Controls.Add(tabStudyYears);
             mainTabs.Controls.Add(tabClassrooms);
+            mainTabs.Controls.Add(tabFaculty);
+            mainTabs.Controls.Add(tabSubjects);
             mainTabs.Dock = DockStyle.Fill;
             mainTabs.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             mainTabs.ItemSize = new Size(150, 42);
@@ -214,56 +319,505 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             mainTabs.Padding = new Point(12, 4);
             mainTabs.SelectedIndex = 0;
             mainTabs.Size = new Size(1248, 696);
-            mainTabs.SizeMode = TabSizeMode.Fixed;
-            mainTabs.TabButtonHoverState.FillColor = SidebarHoverColor;
+            mainTabs.TabButtonHoverState.BorderColor = Color.Empty;
+            mainTabs.TabButtonHoverState.FillColor = Color.FromArgb(40, 52, 70);
+            mainTabs.TabButtonHoverState.Font = new Font("Segoe UI Semibold", 10F);
             mainTabs.TabButtonHoverState.ForeColor = Color.White;
-            mainTabs.TabButtonHoverState.InnerColor = PrimaryColor;
-            mainTabs.TabButtonIdleState.FillColor = SidebarColor;
+            mainTabs.TabButtonHoverState.InnerColor = Color.FromArgb(40, 52, 70);
+            mainTabs.TabButtonIdleState.BorderColor = Color.Empty;
+            mainTabs.TabButtonIdleState.FillColor = Color.FromArgb(33, 42, 57);
+            mainTabs.TabButtonIdleState.Font = new Font("Segoe UI Semibold", 10F);
             mainTabs.TabButtonIdleState.ForeColor = Color.FromArgb(203, 213, 225);
-            mainTabs.TabButtonIdleState.InnerColor = SidebarColor;
-            mainTabs.TabButtonSelectedState.FillColor = HeaderColor;
+            mainTabs.TabButtonIdleState.InnerColor = Color.FromArgb(33, 42, 57);
+            mainTabs.TabButtonSelectedState.BorderColor = Color.Empty;
+            mainTabs.TabButtonSelectedState.FillColor = Color.FromArgb(29, 37, 49);
+            mainTabs.TabButtonSelectedState.Font = new Font("Segoe UI Semibold", 10F);
             mainTabs.TabButtonSelectedState.ForeColor = Color.White;
-            mainTabs.TabButtonSelectedState.InnerColor = PrimaryColor;
+            mainTabs.TabButtonSelectedState.InnerColor = Color.FromArgb(76, 132, 255);
+            mainTabs.TabButtonSize = new Size(150, 42);
             mainTabs.TabIndex = 1;
-            mainTabs.TabMenuBackColor = SidebarColor;
-
+            mainTabs.TabMenuBackColor = Color.FromArgb(33, 42, 57);
             //
             // tabDashboard
             //
-            tabDashboard.BackColor = AppBackground;
             tabDashboard.Controls.Add(dashboardContentPanel);
             tabDashboard.Location = new Point(154, 4);
             tabDashboard.Name = "tabDashboard";
-            tabDashboard.Padding = new Padding(0);
             tabDashboard.Size = new Size(1090, 688);
             tabDashboard.TabIndex = 0;
             tabDashboard.Text = "Dashboard";
-
             //
             // dashboardContentPanel
             //
-            dashboardContentPanel.BackColor = AppBackground;
             dashboardContentPanel.Dock = DockStyle.Fill;
-            dashboardContentPanel.FlowDirection = FlowDirection.LeftToRight;
             dashboardContentPanel.Location = new Point(0, 0);
             dashboardContentPanel.Name = "dashboardContentPanel";
             dashboardContentPanel.Padding = new Padding(10);
             dashboardContentPanel.Size = new Size(1090, 688);
             dashboardContentPanel.TabIndex = 0;
-            dashboardContentPanel.WrapContents = true;
-            CreateDashboardDesignerCards();
-
             //
             // tabBranches
             //
-            tabBranches.BackColor = AppBackground;
             tabBranches.Controls.Add(branchesLayout);
             tabBranches.Location = new Point(154, 4);
             tabBranches.Name = "tabBranches";
-            tabBranches.Padding = new Padding(0);
             tabBranches.Size = new Size(1090, 688);
             tabBranches.TabIndex = 1;
             tabBranches.Text = "Branches";
+            //
+            // branchesLayout
+            //
+            branchesLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            branchesLayout.Location = new Point(0, 0);
+            branchesLayout.Name = "branchesLayout";
+            branchesLayout.Size = new Size(200, 100);
+            branchesLayout.TabIndex = 0;
+            //
+            // tabStudyYears
+            //
+            tabStudyYears.Controls.Add(studyYearsLayout);
+            tabStudyYears.Location = new Point(154, 4);
+            tabStudyYears.Name = "tabStudyYears";
+            tabStudyYears.Size = new Size(1090, 688);
+            tabStudyYears.TabIndex = 2;
+            tabStudyYears.Text = "Study Years";
+            //
+            // studyYearsLayout
+            //
+            studyYearsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            studyYearsLayout.Location = new Point(0, 0);
+            studyYearsLayout.Name = "studyYearsLayout";
+            studyYearsLayout.Size = new Size(200, 100);
+            studyYearsLayout.TabIndex = 0;
+            //
+            // tabClassrooms
+            //
+            tabClassrooms.Controls.Add(classroomsLayout);
+            tabClassrooms.Location = new Point(154, 4);
+            tabClassrooms.Name = "tabClassrooms";
+            tabClassrooms.Size = new Size(1090, 688);
+            tabClassrooms.TabIndex = 3;
+            tabClassrooms.Text = "Classrooms";
+            //
+            // classroomsLayout
+            //
+            classroomsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            classroomsLayout.Location = new Point(0, 0);
+            classroomsLayout.Name = "classroomsLayout";
+            classroomsLayout.Size = new Size(200, 100);
+            classroomsLayout.TabIndex = 0;
+            //
+            // tabFaculty
+            //
+            tabFaculty.Controls.Add(facultyLayout);
+            tabFaculty.Location = new Point(154, 4);
+            tabFaculty.Name = "tabFaculty";
+            tabFaculty.Size = new Size(1090, 688);
+            tabFaculty.TabIndex = 4;
+            tabFaculty.Text = "Faculty";
+            //
+            // facultyLayout
+            //
+            facultyLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            facultyLayout.Location = new Point(0, 0);
+            facultyLayout.Name = "facultyLayout";
+            facultyLayout.Size = new Size(200, 100);
+            facultyLayout.TabIndex = 0;
+            //
+            // tabSubjects
+            //
+            tabSubjects.Controls.Add(subjectsLayout);
+            tabSubjects.Location = new Point(154, 4);
+            tabSubjects.Name = "tabSubjects";
+            tabSubjects.Size = new Size(1090, 688);
+            tabSubjects.TabIndex = 5;
+            tabSubjects.Text = "Subjects";
+            //
+            // subjectsLayout
+            //
+            subjectsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            subjectsLayout.Location = new Point(0, 0);
+            subjectsLayout.Name = "subjectsLayout";
+            subjectsLayout.Size = new Size(200, 100);
+            subjectsLayout.TabIndex = 0;
+            //
+            // branchesFormCard
+            //
+            branchesFormCard.CustomizableEdges = customizableEdges5;
+            branchesFormCard.Location = new Point(0, 0);
+            branchesFormCard.Name = "branchesFormCard";
+            branchesFormCard.ShadowDecoration.CustomizableEdges = customizableEdges6;
+            branchesFormCard.Size = new Size(200, 100);
+            branchesFormCard.TabIndex = 0;
+            //
+            // branchesFieldsPanel
+            //
+            branchesFieldsPanel.Location = new Point(0, 0);
+            branchesFieldsPanel.Name = "branchesFieldsPanel";
+            branchesFieldsPanel.Size = new Size(200, 100);
+            branchesFieldsPanel.TabIndex = 0;
+            //
+            // branchesButtonsPanel
+            //
+            branchesButtonsPanel.Location = new Point(0, 0);
+            branchesButtonsPanel.Name = "branchesButtonsPanel";
+            branchesButtonsPanel.Size = new Size(200, 100);
+            branchesButtonsPanel.TabIndex = 0;
+            //
+            // txtBranchName
+            //
+            txtBranchName.CustomizableEdges = customizableEdges7;
+            txtBranchName.DefaultText = "";
+            txtBranchName.Font = new Font("Segoe UI", 9F);
+            txtBranchName.Location = new Point(0, 0);
+            txtBranchName.Name = "txtBranchName";
+            txtBranchName.PlaceholderText = "";
+            txtBranchName.SelectedText = "";
+            txtBranchName.ShadowDecoration.CustomizableEdges = customizableEdges8;
+            txtBranchName.Size = new Size(200, 36);
+            txtBranchName.TabIndex = 0;
+            //
+            // btnBranchAdd
+            //
+            btnBranchAdd.CustomizableEdges = customizableEdges9;
+            btnBranchAdd.Font = new Font("Segoe UI", 9F);
+            btnBranchAdd.ForeColor = Color.White;
+            btnBranchAdd.Location = new Point(0, 0);
+            btnBranchAdd.Name = "btnBranchAdd";
+            btnBranchAdd.ShadowDecoration.CustomizableEdges = customizableEdges10;
+            btnBranchAdd.Size = new Size(180, 45);
+            btnBranchAdd.TabIndex = 0;
+            //
+            // btnBranchUpdate
+            //
+            btnBranchUpdate.CustomizableEdges = customizableEdges11;
+            btnBranchUpdate.Font = new Font("Segoe UI", 9F);
+            btnBranchUpdate.ForeColor = Color.White;
+            btnBranchUpdate.Location = new Point(0, 0);
+            btnBranchUpdate.Name = "btnBranchUpdate";
+            btnBranchUpdate.ShadowDecoration.CustomizableEdges = customizableEdges12;
+            btnBranchUpdate.Size = new Size(180, 45);
+            btnBranchUpdate.TabIndex = 0;
+            //
+            // btnBranchDelete
+            //
+            btnBranchDelete.CustomizableEdges = customizableEdges13;
+            btnBranchDelete.Font = new Font("Segoe UI", 9F);
+            btnBranchDelete.ForeColor = Color.White;
+            btnBranchDelete.Location = new Point(0, 0);
+            btnBranchDelete.Name = "btnBranchDelete";
+            btnBranchDelete.ShadowDecoration.CustomizableEdges = customizableEdges14;
+            btnBranchDelete.Size = new Size(180, 45);
+            btnBranchDelete.TabIndex = 0;
+            //
+            // btnBranchClear
+            //
+            btnBranchClear.CustomizableEdges = customizableEdges15;
+            btnBranchClear.Font = new Font("Segoe UI", 9F);
+            btnBranchClear.ForeColor = Color.White;
+            btnBranchClear.Location = new Point(0, 0);
+            btnBranchClear.Name = "btnBranchClear";
+            btnBranchClear.ShadowDecoration.CustomizableEdges = customizableEdges16;
+            btnBranchClear.Size = new Size(180, 45);
+            btnBranchClear.TabIndex = 0;
+            //
+            // dgvBranches
+            //
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = Color.FromArgb(100, 88, 255);
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 11.25F);
+            dataGridViewCellStyle1.ForeColor = Color.White;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            dgvBranches.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dgvBranches.ColumnHeadersHeight = 15;
+            dgvBranches.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = Color.White;
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 11.25F);
+            dataGridViewCellStyle2.ForeColor = Color.FromArgb(71, 69, 94);
+            dataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(231, 229, 255);
+            dataGridViewCellStyle2.SelectionForeColor = Color.FromArgb(71, 69, 94);
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
+            dgvBranches.DefaultCellStyle = dataGridViewCellStyle2;
+            dgvBranches.GridColor = Color.FromArgb(231, 229, 255);
+            dgvBranches.Location = new Point(0, 0);
+            dgvBranches.Name = "dgvBranches";
+            dgvBranches.RowHeadersVisible = false;
+            dgvBranches.Size = new Size(240, 150);
+            dgvBranches.TabIndex = 0;
+            dgvBranches.ThemeStyle.HeaderStyle.Font = new Font("Segoe UI", 11.25F);
+            dgvBranches.ThemeStyle.RowsStyle.Font = new Font("Segoe UI", 11.25F);
+            dgvBranches.ThemeStyle.RowsStyle.Height = 29;
+            //
+            // studyYearsFormCard
+            //
+            studyYearsFormCard.CustomizableEdges = customizableEdges17;
+            studyYearsFormCard.Location = new Point(0, 0);
+            studyYearsFormCard.Name = "studyYearsFormCard";
+            studyYearsFormCard.ShadowDecoration.CustomizableEdges = customizableEdges18;
+            studyYearsFormCard.Size = new Size(200, 100);
+            studyYearsFormCard.TabIndex = 0;
+            //
+            // studyYearsFieldsPanel
+            //
+            studyYearsFieldsPanel.Location = new Point(0, 0);
+            studyYearsFieldsPanel.Name = "studyYearsFieldsPanel";
+            studyYearsFieldsPanel.Size = new Size(200, 100);
+            studyYearsFieldsPanel.TabIndex = 0;
+            //
+            // studyYearsButtonsPanel
+            //
+            studyYearsButtonsPanel.Location = new Point(0, 0);
+            studyYearsButtonsPanel.Name = "studyYearsButtonsPanel";
+            studyYearsButtonsPanel.Size = new Size(200, 100);
+            studyYearsButtonsPanel.TabIndex = 0;
+            //
+            // txtStudyYearName
+            //
+            txtStudyYearName.CustomizableEdges = customizableEdges19;
+            txtStudyYearName.DefaultText = "";
+            txtStudyYearName.Font = new Font("Segoe UI", 9F);
+            txtStudyYearName.Location = new Point(0, 0);
+            txtStudyYearName.Name = "txtStudyYearName";
+            txtStudyYearName.PlaceholderText = "";
+            txtStudyYearName.SelectedText = "";
+            txtStudyYearName.ShadowDecoration.CustomizableEdges = customizableEdges20;
+            txtStudyYearName.Size = new Size(200, 36);
+            txtStudyYearName.TabIndex = 0;
+            //
+            // btnStudyYearAdd
+            //
+            btnStudyYearAdd.CustomizableEdges = customizableEdges21;
+            btnStudyYearAdd.Font = new Font("Segoe UI", 9F);
+            btnStudyYearAdd.ForeColor = Color.White;
+            btnStudyYearAdd.Location = new Point(0, 0);
+            btnStudyYearAdd.Name = "btnStudyYearAdd";
+            btnStudyYearAdd.ShadowDecoration.CustomizableEdges = customizableEdges22;
+            btnStudyYearAdd.Size = new Size(180, 45);
+            btnStudyYearAdd.TabIndex = 0;
+            //
+            // btnStudyYearUpdate
+            //
+            btnStudyYearUpdate.CustomizableEdges = customizableEdges23;
+            btnStudyYearUpdate.Font = new Font("Segoe UI", 9F);
+            btnStudyYearUpdate.ForeColor = Color.White;
+            btnStudyYearUpdate.Location = new Point(0, 0);
+            btnStudyYearUpdate.Name = "btnStudyYearUpdate";
+            btnStudyYearUpdate.ShadowDecoration.CustomizableEdges = customizableEdges24;
+            btnStudyYearUpdate.Size = new Size(180, 45);
+            btnStudyYearUpdate.TabIndex = 0;
+            //
+            // btnStudyYearDelete
+            //
+            btnStudyYearDelete.CustomizableEdges = customizableEdges25;
+            btnStudyYearDelete.Font = new Font("Segoe UI", 9F);
+            btnStudyYearDelete.ForeColor = Color.White;
+            btnStudyYearDelete.Location = new Point(0, 0);
+            btnStudyYearDelete.Name = "btnStudyYearDelete";
+            btnStudyYearDelete.ShadowDecoration.CustomizableEdges = customizableEdges26;
+            btnStudyYearDelete.Size = new Size(180, 45);
+            btnStudyYearDelete.TabIndex = 0;
+            //
+            // dgvStudyYears
+            //
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = Color.FromArgb(100, 88, 255);
+            dataGridViewCellStyle3.Font = new Font("Segoe UI", 11.25F);
+            dataGridViewCellStyle3.ForeColor = Color.White;
+            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
+            dgvStudyYears.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dgvStudyYears.ColumnHeadersHeight = 15;
+            dgvStudyYears.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = Color.White;
+            dataGridViewCellStyle4.Font = new Font("Segoe UI", 11.25F);
+            dataGridViewCellStyle4.ForeColor = Color.FromArgb(71, 69, 94);
+            dataGridViewCellStyle4.SelectionBackColor = Color.FromArgb(231, 229, 255);
+            dataGridViewCellStyle4.SelectionForeColor = Color.FromArgb(71, 69, 94);
+            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.False;
+            dgvStudyYears.DefaultCellStyle = dataGridViewCellStyle4;
+            dgvStudyYears.GridColor = Color.FromArgb(231, 229, 255);
+            dgvStudyYears.Location = new Point(0, 0);
+            dgvStudyYears.Name = "dgvStudyYears";
+            dgvStudyYears.RowHeadersVisible = false;
+            dgvStudyYears.Size = new Size(240, 150);
+            dgvStudyYears.TabIndex = 0;
+            dgvStudyYears.ThemeStyle.HeaderStyle.Font = new Font("Segoe UI", 11.25F);
+            dgvStudyYears.ThemeStyle.RowsStyle.Font = new Font("Segoe UI", 11.25F);
+            dgvStudyYears.ThemeStyle.RowsStyle.Height = 29;
+            //
+            // classroomsFormCard
+            //
+            classroomsFormCard.CustomizableEdges = customizableEdges27;
+            classroomsFormCard.Location = new Point(0, 0);
+            classroomsFormCard.Name = "classroomsFormCard";
+            classroomsFormCard.ShadowDecoration.CustomizableEdges = customizableEdges28;
+            classroomsFormCard.Size = new Size(200, 100);
+            classroomsFormCard.TabIndex = 0;
+            //
+            // classroomsFieldsPanel
+            //
+            classroomsFieldsPanel.Location = new Point(0, 0);
+            classroomsFieldsPanel.Name = "classroomsFieldsPanel";
+            classroomsFieldsPanel.Size = new Size(200, 100);
+            classroomsFieldsPanel.TabIndex = 0;
+            //
+            // classroomsButtonsPanel
+            //
+            classroomsButtonsPanel.Location = new Point(0, 0);
+            classroomsButtonsPanel.Name = "classroomsButtonsPanel";
+            classroomsButtonsPanel.Size = new Size(200, 100);
+            classroomsButtonsPanel.TabIndex = 0;
+            //
+            // txtClassroomNumber
+            //
+            txtClassroomNumber.CustomizableEdges = customizableEdges29;
+            txtClassroomNumber.DefaultText = "";
+            txtClassroomNumber.Font = new Font("Segoe UI", 9F);
+            txtClassroomNumber.Location = new Point(0, 0);
+            txtClassroomNumber.Name = "txtClassroomNumber";
+            txtClassroomNumber.PlaceholderText = "";
+            txtClassroomNumber.SelectedText = "";
+            txtClassroomNumber.ShadowDecoration.CustomizableEdges = customizableEdges30;
+            txtClassroomNumber.Size = new Size(200, 36);
+            txtClassroomNumber.TabIndex = 0;
+            //
+            // numClassroomCapacity
+            //
+            numClassroomCapacity.BackColor = Color.Transparent;
+            numClassroomCapacity.CustomizableEdges = customizableEdges31;
+            numClassroomCapacity.Font = new Font("Segoe UI", 9F);
+            numClassroomCapacity.Location = new Point(0, 0);
+            numClassroomCapacity.Name = "numClassroomCapacity";
+            numClassroomCapacity.ShadowDecoration.CustomizableEdges = customizableEdges32;
+            numClassroomCapacity.Size = new Size(100, 36);
+            numClassroomCapacity.TabIndex = 0;
+            //
+            // cmbRoomType
+            //
+            cmbRoomType.BackColor = Color.Transparent;
+            cmbRoomType.CustomizableEdges = customizableEdges33;
+            cmbRoomType.DrawMode = DrawMode.OwnerDrawFixed;
+            cmbRoomType.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbRoomType.FocusedColor = Color.Empty;
+            cmbRoomType.Font = new Font("Segoe UI", 10F);
+            cmbRoomType.ForeColor = Color.FromArgb(68, 88, 112);
+            cmbRoomType.ItemHeight = 30;
+            cmbRoomType.Location = new Point(0, 0);
+            cmbRoomType.Name = "cmbRoomType";
+            cmbRoomType.ShadowDecoration.CustomizableEdges = customizableEdges34;
+            cmbRoomType.Size = new Size(140, 36);
+            cmbRoomType.TabIndex = 0;
+            //
+            // btnClassroomAdd
+            //
+            btnClassroomAdd.CustomizableEdges = customizableEdges35;
+            btnClassroomAdd.Font = new Font("Segoe UI", 9F);
+            btnClassroomAdd.ForeColor = Color.White;
+            btnClassroomAdd.Location = new Point(0, 0);
+            btnClassroomAdd.Name = "btnClassroomAdd";
+            btnClassroomAdd.ShadowDecoration.CustomizableEdges = customizableEdges36;
+            btnClassroomAdd.Size = new Size(180, 45);
+            btnClassroomAdd.TabIndex = 0;
+            //
+            // btnClassroomUpdate
+            //
+            btnClassroomUpdate.CustomizableEdges = customizableEdges37;
+            btnClassroomUpdate.Font = new Font("Segoe UI", 9F);
+            btnClassroomUpdate.ForeColor = Color.White;
+            btnClassroomUpdate.Location = new Point(0, 0);
+            btnClassroomUpdate.Name = "btnClassroomUpdate";
+            btnClassroomUpdate.ShadowDecoration.CustomizableEdges = customizableEdges38;
+            btnClassroomUpdate.Size = new Size(180, 45);
+            btnClassroomUpdate.TabIndex = 0;
+            //
+            // btnClassroomDelete
+            //
+            btnClassroomDelete.CustomizableEdges = customizableEdges39;
+            btnClassroomDelete.Font = new Font("Segoe UI", 9F);
+            btnClassroomDelete.ForeColor = Color.White;
+            btnClassroomDelete.Location = new Point(0, 0);
+            btnClassroomDelete.Name = "btnClassroomDelete";
+            btnClassroomDelete.ShadowDecoration.CustomizableEdges = customizableEdges40;
+            btnClassroomDelete.Size = new Size(180, 45);
+            btnClassroomDelete.TabIndex = 0;
+            //
+            // dgvClassrooms
+            //
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = Color.FromArgb(100, 88, 255);
+            dataGridViewCellStyle5.Font = new Font("Segoe UI", 11.25F);
+            dataGridViewCellStyle5.ForeColor = Color.White;
+            dataGridViewCellStyle5.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = DataGridViewTriState.True;
+            dgvClassrooms.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dgvClassrooms.ColumnHeadersHeight = 15;
+            dgvClassrooms.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = Color.White;
+            dataGridViewCellStyle6.Font = new Font("Segoe UI", 11.25F);
+            dataGridViewCellStyle6.ForeColor = Color.FromArgb(71, 69, 94);
+            dataGridViewCellStyle6.SelectionBackColor = Color.FromArgb(231, 229, 255);
+            dataGridViewCellStyle6.SelectionForeColor = Color.FromArgb(71, 69, 94);
+            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.False;
+            dgvClassrooms.DefaultCellStyle = dataGridViewCellStyle6;
+            dgvClassrooms.GridColor = Color.FromArgb(231, 229, 255);
+            dgvClassrooms.Location = new Point(0, 0);
+            dgvClassrooms.Name = "dgvClassrooms";
+            dgvClassrooms.RowHeadersVisible = false;
+            dgvClassrooms.Size = new Size(240, 150);
+            dgvClassrooms.TabIndex = 0;
+            dgvClassrooms.ThemeStyle.HeaderStyle.Font = new Font("Segoe UI", 11.25F);
+            dgvClassrooms.ThemeStyle.RowsStyle.Font = new Font("Segoe UI", 11.25F);
+            dgvClassrooms.ThemeStyle.RowsStyle.Height = 29;
+            ConfigureDesignerOwnedPages();
+            //
+            // MainForm
+            //
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(1280, 820);
+            Controls.Add(rootLayout);
+            MinimumSize = new Size(1080, 720);
+            Name = "MainForm";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Timetable and Classroom Management System";
+            Load += MainForm_Load_1;
+            rootLayout.ResumeLayout(false);
+            headerPanel.ResumeLayout(false);
+            headerPanel.PerformLayout();
+            mainTabs.ResumeLayout(false);
+            tabDashboard.ResumeLayout(false);
+            tabBranches.ResumeLayout(false);
+            tabStudyYears.ResumeLayout(false);
+            tabClassrooms.ResumeLayout(false);
+            tabFaculty.ResumeLayout(false);
+            tabSubjects.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgvBranches).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dgvStudyYears).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numClassroomCapacity).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dgvClassrooms).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dgvFacultyMembers).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numSemester).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numTheoreticalHours).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numPracticalHours).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numCreditUnits).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dgvSubjects).EndInit();
+            ResumeLayout(false);
+        }
+
+        private void ConfigureDesignerOwnedPages()
+        {
+            dashboardContentPanel.FlowDirection = FlowDirection.LeftToRight;
+            dashboardContentPanel.WrapContents = true;
+            dashboardContentPanel.BackColor = AppBackground;
+            CreateDashboardDesignerCards();
+
             CreateDataDesignerPage(
                 branchesLayout,
                 branchesFormCard,
@@ -278,17 +832,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             AddDesignerButton(branchesButtonsPanel, btnBranchDelete, "Delete", DangerColor);
             AddDesignerButton(branchesButtonsPanel, btnBranchClear, "Clear", MutedColor);
 
-            //
-            // tabStudyYears
-            //
-            tabStudyYears.BackColor = AppBackground;
-            tabStudyYears.Controls.Add(studyYearsLayout);
-            tabStudyYears.Location = new Point(154, 4);
-            tabStudyYears.Name = "tabStudyYears";
-            tabStudyYears.Padding = new Padding(0);
-            tabStudyYears.Size = new Size(1090, 688);
-            tabStudyYears.TabIndex = 2;
-            tabStudyYears.Text = "Study Years";
             CreateDataDesignerPage(
                 studyYearsLayout,
                 studyYearsFormCard,
@@ -302,17 +845,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             AddDesignerButton(studyYearsButtonsPanel, btnStudyYearUpdate, "Update", PrimaryColor);
             AddDesignerButton(studyYearsButtonsPanel, btnStudyYearDelete, "Delete", DangerColor);
 
-            //
-            // tabClassrooms
-            //
-            tabClassrooms.BackColor = AppBackground;
-            tabClassrooms.Controls.Add(classroomsLayout);
-            tabClassrooms.Location = new Point(154, 4);
-            tabClassrooms.Name = "tabClassrooms";
-            tabClassrooms.Padding = new Padding(0);
-            tabClassrooms.Size = new Size(1090, 688);
-            tabClassrooms.TabIndex = 3;
-            tabClassrooms.Text = "Classrooms";
             CreateDataDesignerPage(
                 classroomsLayout,
                 classroomsFormCard,
@@ -323,43 +855,54 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 "Manage rooms, labs, and their capacity.");
             AddDesignerTextField(classroomsFieldsPanel, "Room number", txtClassroomNumber, "A-101");
             AddDesignerNumberField(classroomsFieldsPanel, "Capacity", numClassroomCapacity, 150, 1, 1000, 30);
-            AddDesignerComboField(classroomsFieldsPanel, "Room type", cmbRoomType);
+            AddDesignerComboField(classroomsFieldsPanel, "Room type", cmbRoomType, new object[] { "Lecture", "Lab" }, 0);
             AddDesignerButton(classroomsButtonsPanel, btnClassroomAdd, "Add", SuccessColor);
             AddDesignerButton(classroomsButtonsPanel, btnClassroomUpdate, "Update", PrimaryColor);
             AddDesignerButton(classroomsButtonsPanel, btnClassroomDelete, "Delete", DangerColor);
 
-            //
-            // MainForm
-            //
-            AutoScaleDimensions = new SizeF(8F, 20F);
-            AutoScaleMode = AutoScaleMode.Font;
-            BackColor = AppBackground;
-            ClientSize = new Size(1280, 820);
-            Controls.Add(rootLayout);
-            MinimumSize = new Size(1080, 720);
-            Name = "MainForm";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "Timetable and Classroom Management System";
-            Load += MainForm_Load_1;
-            rootLayout.ResumeLayout(false);
-            headerPanel.ResumeLayout(false);
-            headerPanel.PerformLayout();
-            mainTabs.ResumeLayout(false);
-            tabDashboard.ResumeLayout(false);
-            tabBranches.ResumeLayout(false);
-            branchesLayout.ResumeLayout(false);
-            branchesFormCard.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dgvBranches).EndInit();
-            tabStudyYears.ResumeLayout(false);
-            studyYearsLayout.ResumeLayout(false);
-            studyYearsFormCard.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dgvStudyYears).EndInit();
-            tabClassrooms.ResumeLayout(false);
-            classroomsLayout.ResumeLayout(false);
-            classroomsFormCard.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)numClassroomCapacity).EndInit();
-            ((System.ComponentModel.ISupportInitialize)dgvClassrooms).EndInit();
-            ResumeLayout(false);
+            CreateDataDesignerPage(
+                facultyLayout,
+                facultyFormCard,
+                facultyFieldsPanel,
+                facultyButtonsPanel,
+                dgvFacultyMembers,
+                "Faculty",
+                "Manage instructors and academic titles.");
+            AddDesignerTextField(facultyFieldsPanel, "Full name", txtFacultyName, "Dr. Sara Ahmed");
+            AddDesignerComboField(
+                facultyFieldsPanel,
+                "Academic title",
+                cmbAcademicTitle,
+                new object[] { "Professor", "Assistant Professor", "Lecturer", "Assistant Lecturer" },
+                1);
+            AddDesignerButton(facultyButtonsPanel, btnFacultyAdd, "Add", SuccessColor);
+            AddDesignerButton(facultyButtonsPanel, btnFacultyUpdate, "Update", PrimaryColor);
+            AddDesignerButton(facultyButtonsPanel, btnFacultyDelete, "Delete", DangerColor);
+
+            CreateDataDesignerPage(
+                subjectsLayout,
+                subjectsFormCard,
+                subjectsFieldsPanel,
+                subjectsButtonsPanel,
+                dgvSubjects,
+                "Subjects",
+                "Manage course information and hours.");
+            AddDesignerTextField(subjectsFieldsPanel, "Subject name", txtSubjectName, "Algorithms");
+            AddDesignerLookupComboField(subjectsFieldsPanel, "Study year", cmbSubjectYear);
+            AddDesignerLookupComboField(subjectsFieldsPanel, "Branch", cmbSubjectBranch);
+            AddDesignerNumberField(subjectsFieldsPanel, "Semester", numSemester, 130, 1, 2, 1);
+            AddDesignerNumberField(subjectsFieldsPanel, "Theory hours", numTheoreticalHours, 150, 0, 20, 2, 2, 0.5M);
+            AddDesignerNumberField(subjectsFieldsPanel, "Practical hours", numPracticalHours, 150, 0, 20, 0, 2, 0.5M);
+            AddDesignerNumberField(subjectsFieldsPanel, "Credit units", numCreditUnits, 150, 0.5M, 20, 3, 2, 0.5M);
+            ConfigureDesignerFilterCombo(cmbSubjectFilterYear, 170);
+            ConfigureDesignerFilterCombo(cmbSubjectFilterBranch, 170);
+            ConfigureDesignerFilterCombo(cmbSubjectFilterSemester, 150);
+            subjectsButtonsPanel.Controls.Add(cmbSubjectFilterYear);
+            subjectsButtonsPanel.Controls.Add(cmbSubjectFilterBranch);
+            subjectsButtonsPanel.Controls.Add(cmbSubjectFilterSemester);
+            AddDesignerButton(subjectsButtonsPanel, btnSubjectAdd, "Add", SuccessColor);
+            AddDesignerButton(subjectsButtonsPanel, btnSubjectUpdate, "Update", PrimaryColor);
+            AddDesignerButton(subjectsButtonsPanel, btnSubjectDelete, "Delete", DangerColor);
         }
 
         private void CreateDashboardDesignerCards()
@@ -549,7 +1092,9 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             int width,
             decimal minimum,
             decimal maximum,
-            decimal value)
+            decimal value,
+            int decimalPlaces = 0,
+            decimal increment = 1)
         {
             input.BorderColor = BorderColor;
             input.BorderRadius = 8;
@@ -560,12 +1105,44 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             input.Minimum = minimum;
             input.Maximum = maximum;
             input.Value = value;
+            input.DecimalPlaces = decimalPlaces;
+            input.Increment = increment;
             input.Width = width;
 
             fieldsPanel.Controls.Add(CreateDesignerFieldPanel(labelText, input, width));
         }
 
-        private void AddDesignerComboField(FlowLayoutPanel fieldsPanel, string labelText, Guna.UI2.WinForms.Guna2ComboBox input)
+        private void AddDesignerLookupComboField(
+            FlowLayoutPanel fieldsPanel,
+            string labelText,
+            Guna.UI2.WinForms.Guna2ComboBox input,
+            int width = 220)
+        {
+            ConfigureDesignerCombo(input, width);
+            fieldsPanel.Controls.Add(CreateDesignerFieldPanel(labelText, input, width));
+        }
+
+        private void AddDesignerComboField(
+            FlowLayoutPanel fieldsPanel,
+            string labelText,
+            Guna.UI2.WinForms.Guna2ComboBox input,
+            object[] items,
+            int selectedIndex)
+        {
+            ConfigureDesignerCombo(input, 220);
+            input.Items.AddRange(items);
+            input.SelectedIndex = items.Length > selectedIndex ? selectedIndex : 0;
+
+            fieldsPanel.Controls.Add(CreateDesignerFieldPanel(labelText, input, 220));
+        }
+
+        private void ConfigureDesignerFilterCombo(Guna.UI2.WinForms.Guna2ComboBox input, int width)
+        {
+            ConfigureDesignerCombo(input, width);
+            input.Margin = new Padding(0, 6, 10, 0);
+        }
+
+        private void ConfigureDesignerCombo(Guna.UI2.WinForms.Guna2ComboBox input, int width)
         {
             input.BorderColor = BorderColor;
             input.BorderRadius = 8;
@@ -574,11 +1151,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             input.Font = new Font("Segoe UI", 10F);
             input.ForeColor = HeaderColor;
             input.Height = 40;
-            input.Items.AddRange(new object[] { "Lecture", "Lab" });
-            input.SelectedIndex = 0;
-            input.Width = 220;
-
-            fieldsPanel.Controls.Add(CreateDesignerFieldPanel(labelText, input, 220));
+            input.Width = width;
         }
 
         private Panel CreateDesignerFieldPanel(string labelText, Control input, int width)
