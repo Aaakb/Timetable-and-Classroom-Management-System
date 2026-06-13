@@ -177,6 +177,10 @@ END;
 
             MergeDuplicateBranches(context, branchIds);
             MergeDuplicateStudyYears(context, studyYearIds);
+            NormalizeAcademicStructure(context, studyYearIds, branchIds);
+            MergeDuplicateSubjects(context);
+            MergeDuplicateSections(context);
+            EnsureDefaultSections(context, studyYearIds, branchIds);
             MergeDuplicateSections(context);
         }
 
@@ -327,6 +331,145 @@ END;
             context.SaveChanges();
         }
 
+        private static void NormalizeAcademicStructure(
+            AppDbContext context,
+            Dictionary<string, int> studyYearIds,
+            Dictionary<string, int> branchIds)
+        {
+            int firstYearId = studyYearIds[ReferenceNameNormalizer.FirstYear];
+            int secondYearId = studyYearIds[ReferenceNameNormalizer.SecondYear];
+            int[] generalYearIds = { firstYearId, secondYearId };
+
+            foreach (Subject subject in context.Subjects.Where(s => generalYearIds.Contains(s.StudyYearID) && s.BranchID.HasValue))
+            {
+                subject.BranchID = null;
+            }
+
+            foreach (Schedule schedule in context.Schedules.Where(s => s.StudyYearID.HasValue && generalYearIds.Contains(s.StudyYearID.Value)))
+            {
+                schedule.BranchID = null;
+            }
+
+            foreach (Section section in context.Sections.ToList())
+            {
+                if (!studyYearIds.ContainsValue(section.StudyYearID))
+                {
+                    continue;
+                }
+
+                if (generalYearIds.Contains(section.StudyYearID))
+                {
+                    section.BranchID = null;
+                }
+
+                section.SectionName = CleanSectionCode(
+                    section.SectionName,
+                    context.StudyYears.First(y => y.StudyYearID == section.StudyYearID).YearName,
+                    section.BranchID.HasValue ? context.Branches.FirstOrDefault(b => b.BranchID == section.BranchID.Value)?.BranchName : null);
+            }
+
+            context.SaveChanges();
+        }
+
+        private static void EnsureDefaultSections(
+            AppDbContext context,
+            Dictionary<string, int> studyYearIds,
+            Dictionary<string, int> branchIds)
+        {
+            EnsureSection(context, studyYearIds[ReferenceNameNormalizer.FirstYear], null, "A", 40);
+            EnsureSection(context, studyYearIds[ReferenceNameNormalizer.FirstYear], null, "B", 40);
+            EnsureSection(context, studyYearIds[ReferenceNameNormalizer.SecondYear], null, "A", 40);
+            EnsureSection(context, studyYearIds[ReferenceNameNormalizer.SecondYear], null, "B", 40);
+
+            foreach (string yearName in new[] { ReferenceNameNormalizer.ThirdYear, ReferenceNameNormalizer.FourthYear })
+            {
+                int studyYearId = studyYearIds[yearName];
+
+                foreach (int branchId in branchIds.Values)
+                {
+                    EnsureSection(context, studyYearId, branchId, "A", 35);
+                }
+            }
+
+            context.SaveChanges();
+        }
+
+        private static void EnsureSection(AppDbContext context, int studyYearId, int? branchId, string sectionName, int studentCount)
+        {
+            bool exists = context.Sections
+                .AsEnumerable()
+                .Any(s =>
+                    s.StudyYearID == studyYearId &&
+                    s.BranchID == branchId &&
+                    NormalizeSectionKey(s.SectionName) == NormalizeSectionKey(sectionName));
+
+            if (exists)
+            {
+                return;
+            }
+
+            context.Sections.Add(new Section
+            {
+                SectionName = sectionName,
+                StudyYearID = studyYearId,
+                BranchID = branchId,
+                StudentCount = studentCount
+            });
+        }
+
+        private static void MergeDuplicateSubjects(AppDbContext context)
+        {
+            List<Subject> subjects = context.Subjects.ToList();
+            var duplicateGroups = subjects
+                .GroupBy(s => new
+                {
+                    Name = NormalizeSubjectKey(s.SubjectName),
+                    s.StudyYearID,
+                    s.SemesterNumber,
+                    BranchID = s.BranchID ?? 0
+                })
+                .Where(group => group.Count() > 1)
+                .ToList();
+
+            foreach (var group in duplicateGroups)
+            {
+                Subject keep = group.OrderBy(s => s.SubjectID).First();
+
+                foreach (Subject duplicate in group.Where(s => s.SubjectID != keep.SubjectID))
+                {
+                    foreach (Schedule schedule in context.Schedules.Where(s => s.SubjectID == duplicate.SubjectID))
+                    {
+                        schedule.SubjectID = keep.SubjectID;
+                    }
+
+                    foreach (FacultyMemberSubject assignment in context.FacultyMemberSubjects.Where(a => a.SubjectID == duplicate.SubjectID).ToList())
+                    {
+                        bool keepAssignmentExists = context.FacultyMemberSubjects.Any(a =>
+                            a.FacultyMemberID == assignment.FacultyMemberID &&
+                            a.SubjectID == keep.SubjectID);
+
+                        if (keepAssignmentExists)
+                        {
+                            context.FacultyMemberSubjects.Remove(assignment);
+                        }
+                        else
+                        {
+                            context.FacultyMemberSubjects.Remove(assignment);
+                            context.FacultyMemberSubjects.Add(new FacultyMemberSubject
+                            {
+                                FacultyMemberID = assignment.FacultyMemberID,
+                                SubjectID = keep.SubjectID
+                            });
+                        }
+                    }
+
+                    context.Subjects.Remove(duplicate);
+                }
+            }
+
+            context.SaveChanges();
+        }
+
         private static void MergeDuplicateSections(AppDbContext context)
         {
             List<Section> sections = context.Sections.ToList();
@@ -374,6 +517,57 @@ END;
         private static string NormalizeSectionKey(string sectionName)
         {
             return new string(sectionName.Trim().ToLowerInvariant().Where(char.IsLetterOrDigit).ToArray());
+        }
+
+        private static string NormalizeSubjectKey(string subjectName)
+        {
+            return new string(subjectName.Trim().ToLowerInvariant().Where(char.IsLetterOrDigit).ToArray());
+        }
+
+        private static string CleanSectionCode(string sectionName, string yearName, string? branchName)
+        {
+            string result = sectionName.Trim();
+
+            result = RemoveNamePart(result, yearName);
+            result = RemoveNamePart(result, yearName.Replace(" Year", string.Empty, StringComparison.OrdinalIgnoreCase));
+            result = RemoveNamePart(result, "Year");
+
+            if (!string.IsNullOrWhiteSpace(branchName))
+            {
+                result = RemoveNamePart(result, branchName);
+                result = RemoveNamePart(result, CompactBranchName(branchName));
+            }
+
+            result = string.Join(" ", result.Trim('-', ' ', '/', '\\', '|').Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries));
+
+            return string.IsNullOrWhiteSpace(result) ? sectionName.Trim() : result;
+        }
+
+        private static string RemoveNamePart(string value, string part)
+        {
+            if (string.IsNullOrWhiteSpace(value) || string.IsNullOrWhiteSpace(part))
+            {
+                return value;
+            }
+
+            int index;
+            while ((index = value.IndexOf(part, StringComparison.OrdinalIgnoreCase)) >= 0)
+            {
+                value = value.Remove(index, part.Length);
+            }
+
+            return value;
+        }
+
+        private static string CompactBranchName(string branchName)
+        {
+            return branchName switch
+            {
+                ReferenceNameNormalizer.ComputerScience => "CS",
+                ReferenceNameNormalizer.CyberSecurity => "Cyber",
+                ReferenceNameNormalizer.InformationTechnology => "IT",
+                _ => branchName
+            };
         }
     }
 }

@@ -42,23 +42,10 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private List<FacultyMemberSubject> _assignments = new List<FacultyMemberSubject>();
         private List<Schedule> _schedules = new List<Schedule>();
 
-        private Label lblBranchCount = null!;
-        private Label lblSubjectCount = null!;
-        private Label lblClassroomCount = null!;
-        private Label lblScheduleCount = null!;
-
-        private Guna2DataGridView dgvBranches = null!;
-        private Guna2TextBox txtBranchName = null!;
         private int selectedBranchId;
 
-        private Guna2DataGridView dgvStudyYears = null!;
-        private Guna2TextBox txtStudyYearName = null!;
         private int selectedStudyYearId;
 
-        private Guna2DataGridView dgvClassrooms = null!;
-        private Guna2TextBox txtClassroomNumber = null!;
-        private Guna2NumericUpDown numClassroomCapacity = null!;
-        private Guna2ComboBox cmbRoomType = null!;
         private int selectedClassroomId;
 
         private Guna2DataGridView dgvFacultyMembers = null!;
@@ -129,54 +116,44 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private void BuildInterface()
         {
             BackColor = AppBackground;
-            Controls.Clear();
+            WireDesignerPages();
 
-            var root = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                RowCount = 2,
-                ColumnCount = 1,
-                BackColor = AppBackground,
-                Padding = new Padding(16)
-            };
+            mainTabs.Controls.Add(CreateFacultyPage());
+            mainTabs.Controls.Add(CreateSubjectsPage());
+            mainTabs.Controls.Add(CreateSectionsPage());
+            mainTabs.Controls.Add(CreateTimeSlotsPage());
+            mainTabs.Controls.Add(CreateAssignmentsPage());
+            mainTabs.Controls.Add(CreateSchedulesPage());
+        }
 
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 92));
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        private void WireDesignerPages()
+        {
+            btnRefresh.Click += (_, _) => TryLoadAllData();
 
-            root.Controls.Add(CreateHeader(), 0, 0);
+            btnBranchAdd.Click += (_, _) =>
+                RunCommand(() => _branchService.AddBranch(txtBranchName.Text), "Branch added successfully.", ClearBranchInputs);
+            btnBranchUpdate.Click += (_, _) =>
+                RunCommand(() => _branchService.UpdateBranch(selectedBranchId, txtBranchName.Text), "Branch updated successfully.", ClearBranchInputs);
+            btnBranchDelete.Click += (_, _) =>
+                ConfirmAndRun("Delete selected branch?", () => _branchService.DeleteBranch(selectedBranchId), "Branch deleted successfully.", ClearBranchInputs);
+            btnBranchClear.Click += (_, _) => ClearBranchInputs();
+            dgvBranches.CellClick += DgvBranches_CellClick;
 
-            var tabs = new Guna2TabControl
-            {
-                Dock = DockStyle.Fill,
-                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-                ItemSize = new Size(150, 42),
-                SizeMode = TabSizeMode.Fixed,
-                Padding = new Point(12, 4),
-                TabMenuBackColor = SidebarColor
-            };
-            tabs.TabButtonIdleState.FillColor = SidebarColor;
-            tabs.TabButtonIdleState.ForeColor = Color.FromArgb(203, 213, 225);
-            tabs.TabButtonIdleState.InnerColor = SidebarColor;
-            tabs.TabButtonHoverState.FillColor = SidebarHoverColor;
-            tabs.TabButtonHoverState.ForeColor = Color.White;
-            tabs.TabButtonHoverState.InnerColor = PrimaryColor;
-            tabs.TabButtonSelectedState.FillColor = HeaderColor;
-            tabs.TabButtonSelectedState.ForeColor = Color.White;
-            tabs.TabButtonSelectedState.InnerColor = PrimaryColor;
+            btnStudyYearAdd.Click += (_, _) =>
+                RunCommand(() => _studyYearService.AddStudyYear(txtStudyYearName.Text), "Study year added successfully.", ClearStudyYearInputs);
+            btnStudyYearUpdate.Click += (_, _) =>
+                RunCommand(() => _studyYearService.UpdateStudyYear(selectedStudyYearId, txtStudyYearName.Text), "Study year updated successfully.", ClearStudyYearInputs);
+            btnStudyYearDelete.Click += (_, _) =>
+                ConfirmAndRun("Delete selected study year?", () => _studyYearService.DeleteStudyYear(selectedStudyYearId), "Study year deleted successfully.", ClearStudyYearInputs);
+            dgvStudyYears.CellClick += DgvStudyYears_CellClick;
 
-            tabs.Controls.Add(CreateDashboardPage());
-            tabs.Controls.Add(CreateBranchesPage());
-            tabs.Controls.Add(CreateStudyYearsPage());
-            tabs.Controls.Add(CreateClassroomsPage());
-            tabs.Controls.Add(CreateFacultyPage());
-            tabs.Controls.Add(CreateSubjectsPage());
-            tabs.Controls.Add(CreateSectionsPage());
-            tabs.Controls.Add(CreateTimeSlotsPage());
-            tabs.Controls.Add(CreateAssignmentsPage());
-            tabs.Controls.Add(CreateSchedulesPage());
-
-            root.Controls.Add(tabs, 0, 1);
-            Controls.Add(root);
+            btnClassroomAdd.Click += (_, _) =>
+                RunCommand(() => _classroomService.AddClassroom(txtClassroomNumber.Text, (int)numClassroomCapacity.Value, SelectedRoomType()), "Classroom added successfully.", ClearClassroomInputs);
+            btnClassroomUpdate.Click += (_, _) =>
+                RunCommand(() => _classroomService.UpdateClassroom(selectedClassroomId, txtClassroomNumber.Text, (int)numClassroomCapacity.Value, SelectedRoomType()), "Classroom updated successfully.", ClearClassroomInputs);
+            btnClassroomDelete.Click += (_, _) =>
+                ConfirmAndRun("Delete selected classroom?", () => _classroomService.DeleteClassroom(selectedClassroomId), "Classroom deleted successfully.", ClearClassroomInputs);
+            dgvClassrooms.CellClick += DgvClassrooms_CellClick;
         }
 
         private Control CreateHeader()
@@ -524,6 +501,8 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 "Saturday"
             });
             cmbScheduleDay.SelectedIndex = 0;
+            cmbScheduleYear.SelectedIndexChanged += (_, _) => RefreshScheduleSubjectOptions();
+            cmbScheduleBranch.SelectedIndexChanged += (_, _) => RefreshScheduleSubjectOptions();
             cmbScheduleSection.SelectedIndexChanged += (_, _) => SyncScheduleSectionContext();
             cmbScheduleFilterDay.Items.AddRange(new object[]
             {
@@ -955,13 +934,13 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             SetComboItems(cmbAssignFaculty, _facultyMembers.Select(f => new LookupItem(f.FacultyMemberID, f.FullName)), false);
             SetComboItems(cmbAssignSubject, _subjects.Select(s => new LookupItem(s.SubjectID, s.SubjectName)), false);
 
-            SetComboItems(cmbScheduleSubject, _subjects.Select(s => new LookupItem(s.SubjectID, s.SubjectName)), true, "Select subject");
             SetComboItems(cmbScheduleFaculty, _facultyMembers.Select(f => new LookupItem(f.FacultyMemberID, f.FullName)), true, "Select faculty");
             SetComboItems(cmbScheduleClassroom, _classrooms.Select(c => new LookupItem(c.ClassroomID, $"{c.ClassroomNumber} ({c.Capacity})")), true, "Select classroom");
             SetComboItems(cmbScheduleTimeSlot, _timeSlots.Where(t => !t.IsBreak).Select(t => new LookupItem(t.TimeSlotID, $"{FormatTime(t.StartTime)} - {FormatTime(t.EndTime)}")), true, "Select time slot");
             SetComboItems(cmbScheduleYear, _studyYears.Select(y => new LookupItem(y.StudyYearID, y.YearName)), true, "Select study year");
             SetComboItems(cmbScheduleBranch, _branches.Select(b => new LookupItem(b.BranchID, b.BranchName)), true);
             SetComboItems(cmbScheduleSection, _sections.Select(s => new LookupItem(s.SectionID, FormatSectionDisplayName(s))), true, "Select section");
+            RefreshScheduleSubjectOptions();
             SetComboItems(cmbScheduleFilterFaculty, _facultyMembers.Select(f => new LookupItem(f.FacultyMemberID, f.FullName)), true, "All faculty");
             SetComboItems(cmbScheduleFilterYear, _studyYears.Select(y => new LookupItem(y.StudyYearID, y.YearName)), true, "All study years");
             RefreshScheduleFilterSectionOptions();
@@ -1024,6 +1003,47 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
             SetComboItems(cmbScheduleFilterSection, filterSections.Select(s => new LookupItem(s.SectionID, FormatSectionDisplayName(s))), true, emptyLabel);
             cmbScheduleFilterSection.Enabled = true;
+        }
+
+        private void RefreshScheduleSubjectOptions(int preferredSubjectId = 0)
+        {
+            if (cmbScheduleSubject == null)
+            {
+                return;
+            }
+
+            int studyYearId = SelectedId(cmbScheduleYear);
+            int branchId = SelectedId(cmbScheduleBranch);
+
+            IEnumerable<Subject> subjects = _subjects;
+
+            if (studyYearId > 0)
+            {
+                subjects = subjects.Where(s => s.StudyYearID == studyYearId);
+            }
+
+            if (branchId > 0)
+            {
+                subjects = subjects.Where(s => !s.BranchID.HasValue || s.BranchID == branchId);
+            }
+            else if (studyYearId > 0)
+            {
+                subjects = subjects.Where(s => !s.BranchID.HasValue);
+            }
+
+            SetComboItems(
+                cmbScheduleSubject,
+                subjects
+                    .OrderBy(s => s.SemesterNumber)
+                    .ThenBy(s => s.SubjectName)
+                    .Select(s => new LookupItem(s.SubjectID, s.SubjectName)),
+                true,
+                "Select subject");
+
+            if (preferredSubjectId > 0)
+            {
+                SetComboValue(cmbScheduleSubject, preferredSubjectId);
+            }
         }
 
         private void BindGrids()
@@ -1531,7 +1551,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             }
 
             selectedScheduleId = GetGridInt(row, "ScheduleID");
-            SetComboValue(cmbScheduleSubject, GetGridInt(row, "SubjectID"));
+            int subjectId = GetGridInt(row, "SubjectID");
             SetComboValue(cmbScheduleFaculty, GetGridInt(row, "FacultyMemberID"));
             SetComboValue(cmbScheduleClassroom, GetGridInt(row, "ClassroomID"));
             SetComboValue(cmbScheduleTimeSlot, GetGridInt(row, "TimeSlotID"));
@@ -1539,6 +1559,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             SetComboValue(cmbScheduleYear, GetGridNullableInt(row, "StudyYearID") ?? 0);
             SetComboValue(cmbScheduleBranch, GetGridNullableInt(row, "BranchID") ?? 0);
             SetComboValue(cmbScheduleSection, GetGridNullableInt(row, "SectionID") ?? 0);
+            RefreshScheduleSubjectOptions(subjectId);
         }
 
         private void ClearBranchInputs()
@@ -1658,6 +1679,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
             SetComboValue(cmbScheduleYear, section.StudyYearID);
             SetComboValue(cmbScheduleBranch, section.BranchID ?? 0);
+            RefreshScheduleSubjectOptions();
         }
 
         private string ReadScheduleDay()
