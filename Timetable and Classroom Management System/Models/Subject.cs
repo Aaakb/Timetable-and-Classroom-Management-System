@@ -18,11 +18,11 @@ namespace Timetable_and_Classroom_Management_System.Models
 
         public int SemesterNumber { get; set; }
 
-        public int TheoreticalHours { get; set; }
+        public double TheoreticalHours { get; set; }
 
-        public int PracticalHours { get; set; }
+        public double PracticalHours { get; set; }
 
-        public int CreditUnits { get; set; }
+        public double CreditUnits { get; set; }
 
         public string RequirementType { get; set; } = string.Empty;
 

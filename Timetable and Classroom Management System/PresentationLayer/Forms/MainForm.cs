@@ -77,7 +77,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private Guna2NumericUpDown numTheoreticalHours = null!;
         private Guna2NumericUpDown numPracticalHours = null!;
         private Guna2NumericUpDown numCreditUnits = null!;
-        private Guna2TextBox txtRequirementType = null!;
         private int selectedSubjectId;
 
         private Guna2DataGridView dgvSections = null!;
@@ -389,10 +388,9 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             cmbSubjectFilterSemester.Width = 150;
             cmbSubjectFilterSemester.Margin = new Padding(0, 6, 10, 0);
             numSemester = CreateNumber(1, 2, 1);
-            numTheoreticalHours = CreateNumber(0, 20, 2);
-            numPracticalHours = CreateNumber(0, 20, 0);
-            numCreditUnits = CreateNumber(1, 20, 3);
-            txtRequirementType = CreateTextBox("Core / Elective");
+            numTheoreticalHours = CreateNumber(0, 20, 2, 2, 0.5M);
+            numPracticalHours = CreateNumber(0, 20, 0, 2, 0.5M);
+            numCreditUnits = CreateNumber(0.5M, 20, 3, 2, 0.5M);
 
             fields.Controls.Add(CreateField("Subject name", txtSubjectName));
             fields.Controls.Add(CreateField("Study year", cmbSubjectYear));
@@ -401,7 +399,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             fields.Controls.Add(CreateField("Theory hours", numTheoreticalHours, 150));
             fields.Controls.Add(CreateField("Practical hours", numPracticalHours, 150));
             fields.Controls.Add(CreateField("Credit units", numCreditUnits, 150));
-            fields.Controls.Add(CreateField("Requirement", txtRequirementType));
 
             cmbSubjectFilterYear.SelectedIndexChanged += (_, _) => BindSubjectsGrid();
             cmbSubjectFilterBranch.SelectedIndexChanged += (_, _) => BindSubjectsGrid();
@@ -410,12 +407,11 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             buttons.Controls.Add(cmbSubjectFilterBranch);
             buttons.Controls.Add(cmbSubjectFilterSemester);
             buttons.Controls.Add(CreateActionButton("Add", SuccessColor, (_, _) =>
-                RunCommand(() => _subjectService.AddSubject(txtSubjectName.Text, SelectedId(cmbSubjectYear), (int)numSemester.Value, (int)numTheoreticalHours.Value, (int)numPracticalHours.Value, (int)numCreditUnits.Value, txtRequirementType.Text, SelectedOptionalId(cmbSubjectBranch)), "Subject added successfully.", ClearSubjectInputs)));
+                RunCommand(() => _subjectService.AddSubject(txtSubjectName.Text, SelectedId(cmbSubjectYear), (int)numSemester.Value, (double)numTheoreticalHours.Value, (double)numPracticalHours.Value, (double)numCreditUnits.Value, SelectedOptionalId(cmbSubjectBranch)), "Subject added successfully.", ClearSubjectInputs)));
             buttons.Controls.Add(CreateActionButton("Update", PrimaryColor, (_, _) =>
-                RunCommand(() => _subjectService.UpdateSubject(selectedSubjectId, txtSubjectName.Text, SelectedId(cmbSubjectYear), (int)numSemester.Value, (int)numTheoreticalHours.Value, (int)numPracticalHours.Value, (int)numCreditUnits.Value, txtRequirementType.Text, SelectedOptionalId(cmbSubjectBranch)), "Subject updated successfully.", ClearSubjectInputs)));
+                RunCommand(() => _subjectService.UpdateSubject(selectedSubjectId, txtSubjectName.Text, SelectedId(cmbSubjectYear), (int)numSemester.Value, (double)numTheoreticalHours.Value, (double)numPracticalHours.Value, (double)numCreditUnits.Value, SelectedOptionalId(cmbSubjectBranch)), "Subject updated successfully.", ClearSubjectInputs)));
             buttons.Controls.Add(CreateActionButton("Delete", DangerColor, (_, _) =>
                 ConfirmAndRun("Delete selected subject?", () => _subjectService.DeleteSubject(selectedSubjectId), "Subject deleted successfully.", ClearSubjectInputs)));
-            buttons.Controls.Add(CreateActionButton("Clear", MutedColor, (_, _) => ClearSubjectInputs()));
 
             dgvSubjects.CellClick += DgvSubjects_CellClick;
             return page;
@@ -770,7 +766,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             };
         }
 
-        private Guna2NumericUpDown CreateNumber(decimal minimum, decimal maximum, decimal value)
+        private Guna2NumericUpDown CreateNumber(decimal minimum, decimal maximum, decimal value, int decimalPlaces = 0, decimal increment = 1)
         {
             return new Guna2NumericUpDown
             {
@@ -783,7 +779,9 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                 Font = new Font("Segoe UI", 10F),
                 Minimum = minimum,
                 Maximum = maximum,
-                Value = value
+                Value = value,
+                DecimalPlaces = decimalPlaces,
+                Increment = increment
             };
         }
 
@@ -1024,7 +1022,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
                     s.TheoreticalHours,
                     s.PracticalHours,
                     s.CreditUnits,
-                    s.RequirementType,
                     s.BranchID,
                     Branch = GetBranchName(s.BranchID)
                 })
@@ -1203,7 +1200,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             numTheoreticalHours.Value = GetGridDecimal(row, "TheoreticalHours");
             numPracticalHours.Value = GetGridDecimal(row, "PracticalHours");
             numCreditUnits.Value = GetGridDecimal(row, "CreditUnits");
-            txtRequirementType.Text = GetGridText(row, "RequirementType");
         }
 
         private void DgvSections_CellClick(object? sender, DataGridViewCellEventArgs e)
@@ -1299,7 +1295,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         {
             selectedSubjectId = 0;
             txtSubjectName.Clear();
-            txtRequirementType.Clear();
             numSemester.Value = 1;
             numTheoreticalHours.Value = 2;
             numPracticalHours.Value = 0;
@@ -1514,7 +1509,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             SetHeader(grid, "TheoreticalHours", "Theory Hours");
             SetHeader(grid, "PracticalHours", "Practical Hours");
             SetHeader(grid, "CreditUnits", "Credit Units");
-            SetHeader(grid, "RequirementType", "Requirement");
             SetHeader(grid, "SectionName", "Section");
             SetHeader(grid, "StudentCount", "Students");
             SetHeader(grid, "StartTime", "Start Time");

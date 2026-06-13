@@ -401,8 +401,9 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
 
         private static int GetRequiredSessionCount(Subject subject)
         {
-            int totalHours = subject.TheoreticalHours + subject.PracticalHours;
-            return Math.Max(1, totalHours > 0 ? totalHours : subject.CreditUnits);
+            double totalHours = subject.TheoreticalHours + subject.PracticalHours;
+            double requiredSessions = totalHours > 0 ? totalHours : subject.CreditUnits;
+            return Math.Max(1, (int)Math.Ceiling(requiredSessions));
         }
 
         private static bool HasSchedulingConflict(

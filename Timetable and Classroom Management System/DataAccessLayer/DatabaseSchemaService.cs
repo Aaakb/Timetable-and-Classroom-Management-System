@@ -43,6 +43,129 @@ BEGIN
         WHERE SectionID IS NOT NULL;
     END;
 END;
+
+IF OBJECT_ID(N'dbo.Subjects', N'U') IS NOT NULL
+BEGIN
+    DECLARE @subjectsNeedFloatUpdate bit = 0;
+
+    IF EXISTS (
+        SELECT 1
+        FROM sys.columns
+        WHERE object_id = OBJECT_ID(N'dbo.Subjects')
+            AND name IN (N'TheoreticalHours', N'PracticalHours', N'CreditUnits')
+            AND system_type_id <> TYPE_ID(N'float')
+    )
+    BEGIN
+        SET @subjectsNeedFloatUpdate = 1;
+    END;
+
+    IF @subjectsNeedFloatUpdate = 1
+    BEGIN
+        DECLARE @dropSubjectDefaultConstraintsSql nvarchar(max) = N'';
+
+        IF EXISTS (
+            SELECT 1
+            FROM sys.check_constraints
+            WHERE parent_object_id = OBJECT_ID(N'dbo.Subjects')
+                AND name = N'CK_Subjects_Hours'
+        )
+        BEGIN
+            ALTER TABLE dbo.Subjects DROP CONSTRAINT CK_Subjects_Hours;
+        END;
+
+        SELECT @dropSubjectDefaultConstraintsSql +=
+            N'ALTER TABLE dbo.Subjects DROP CONSTRAINT ' + QUOTENAME(dc.name) + N';'
+        FROM sys.default_constraints dc
+        INNER JOIN sys.columns c
+            ON c.object_id = dc.parent_object_id
+            AND c.column_id = dc.parent_column_id
+        WHERE dc.parent_object_id = OBJECT_ID(N'dbo.Subjects')
+            AND c.name IN (N'TheoreticalHours', N'PracticalHours', N'CreditUnits');
+
+        IF @dropSubjectDefaultConstraintsSql <> N''
+        BEGIN
+            EXEC sp_executesql @dropSubjectDefaultConstraintsSql;
+        END;
+
+        IF EXISTS (
+            SELECT 1
+            FROM sys.columns
+            WHERE object_id = OBJECT_ID(N'dbo.Subjects')
+                AND name = N'TheoreticalHours'
+                AND system_type_id <> TYPE_ID(N'float')
+        )
+        BEGIN
+            ALTER TABLE dbo.Subjects ALTER COLUMN TheoreticalHours float NOT NULL;
+        END;
+
+        IF EXISTS (
+            SELECT 1
+            FROM sys.columns
+            WHERE object_id = OBJECT_ID(N'dbo.Subjects')
+                AND name = N'PracticalHours'
+                AND system_type_id <> TYPE_ID(N'float')
+        )
+        BEGIN
+            ALTER TABLE dbo.Subjects ALTER COLUMN PracticalHours float NOT NULL;
+        END;
+
+        IF EXISTS (
+            SELECT 1
+            FROM sys.columns
+            WHERE object_id = OBJECT_ID(N'dbo.Subjects')
+                AND name = N'CreditUnits'
+                AND system_type_id <> TYPE_ID(N'float')
+        )
+        BEGIN
+            ALTER TABLE dbo.Subjects ALTER COLUMN CreditUnits float NOT NULL;
+        END;
+    END;
+
+    IF COL_LENGTH(N'dbo.Subjects', N'TheoreticalHours') IS NOT NULL
+        AND NOT EXISTS (
+            SELECT 1
+            FROM sys.default_constraints dc
+            INNER JOIN sys.columns c
+                ON c.object_id = dc.parent_object_id
+                AND c.column_id = dc.parent_column_id
+            WHERE dc.parent_object_id = OBJECT_ID(N'dbo.Subjects')
+                AND c.name = N'TheoreticalHours'
+        )
+    BEGIN
+        ALTER TABLE dbo.Subjects
+        ADD CONSTRAINT DF_Subjects_TheoreticalHours DEFAULT 0 FOR TheoreticalHours;
+    END;
+
+    IF COL_LENGTH(N'dbo.Subjects', N'PracticalHours') IS NOT NULL
+        AND NOT EXISTS (
+            SELECT 1
+            FROM sys.default_constraints dc
+            INNER JOIN sys.columns c
+                ON c.object_id = dc.parent_object_id
+                AND c.column_id = dc.parent_column_id
+            WHERE dc.parent_object_id = OBJECT_ID(N'dbo.Subjects')
+                AND c.name = N'PracticalHours'
+        )
+    BEGIN
+        ALTER TABLE dbo.Subjects
+        ADD CONSTRAINT DF_Subjects_PracticalHours DEFAULT 0 FOR PracticalHours;
+    END;
+
+    IF COL_LENGTH(N'dbo.Subjects', N'TheoreticalHours') IS NOT NULL
+        AND COL_LENGTH(N'dbo.Subjects', N'PracticalHours') IS NOT NULL
+        AND COL_LENGTH(N'dbo.Subjects', N'CreditUnits') IS NOT NULL
+        AND NOT EXISTS (
+            SELECT 1
+            FROM sys.check_constraints
+            WHERE parent_object_id = OBJECT_ID(N'dbo.Subjects')
+                AND name = N'CK_Subjects_Hours'
+        )
+    BEGIN
+        ALTER TABLE dbo.Subjects WITH CHECK
+        ADD CONSTRAINT CK_Subjects_Hours
+        CHECK (TheoreticalHours >= 0 AND PracticalHours >= 0 AND CreditUnits >= 0);
+    END;
+END;
 ");
             EnsureEnglishReferenceData(context);
         }

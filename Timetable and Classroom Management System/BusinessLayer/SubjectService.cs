@@ -18,14 +18,12 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
             string subjectName,
             int studyYearId,
             int semesterNumber,
-            int theoreticalHours,
-            int practicalHours,
-            int creditUnits,
-            string requirementType,
+            double theoreticalHours,
+            double practicalHours,
+            double creditUnits,
             int? branchId)
         {
             subjectName = subjectName.Trim();
-            requirementType = requirementType.Trim();
 
             if (string.IsNullOrWhiteSpace(subjectName))
             {
@@ -55,11 +53,6 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
             if (creditUnits <= 0)
             {
                 throw new Exception("Credit units must be greater than zero.");
-            }
-
-            if (string.IsNullOrWhiteSpace(requirementType))
-            {
-                throw new Exception("Requirement type is required.");
             }
 
             using AppDbContext context = new AppDbContext();
@@ -103,7 +96,7 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
                 TheoreticalHours = theoreticalHours,
                 PracticalHours = practicalHours,
                 CreditUnits = creditUnits,
-                RequirementType = requirementType,
+                RequirementType = string.Empty,
                 BranchID = branchId
             };
 
@@ -116,14 +109,12 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
             string subjectName,
             int studyYearId,
             int semesterNumber,
-            int theoreticalHours,
-            int practicalHours,
-            int creditUnits,
-            string requirementType,
+            double theoreticalHours,
+            double practicalHours,
+            double creditUnits,
             int? branchId)
         {
             subjectName = subjectName.Trim();
-            requirementType = requirementType.Trim();
 
             if (subjectId <= 0)
             {
@@ -158,11 +149,6 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
             if (creditUnits <= 0)
             {
                 throw new Exception("Credit units must be greater than zero.");
-            }
-
-            if (string.IsNullOrWhiteSpace(requirementType))
-            {
-                throw new Exception("Requirement type is required.");
             }
 
             using AppDbContext context = new AppDbContext();
@@ -213,7 +199,6 @@ namespace Timetable_and_Classroom_Management_System.BusinessLayer
             subject.TheoreticalHours = theoreticalHours;
             subject.PracticalHours = practicalHours;
             subject.CreditUnits = creditUnits;
-            subject.RequirementType = requirementType;
             subject.BranchID = branchId;
 
             context.SaveChanges();
