@@ -61,6 +61,8 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
         private int selectedScheduleId;
         private bool isClearingScheduleInputs;
+        private bool isUiReady;
+        private int manualBindingIndex;
 
         public MainForm()
         {
@@ -71,14 +73,180 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
 
         private void MainForm_Load(object? sender, EventArgs e)
         {
+            if (!isUiReady)
+            {
+                return;
+            }
+
             TryLoadAllData();
         }
 
         private void BuildInterface()
         {
             BackColor = AppBackground;
-            WireDesignerPages();
 
+            isUiReady = TryBindManualControls();
+            if (isUiReady)
+            {
+                WireDesignerPages();
+            }
+        }
+
+        private bool TryBindManualControls()
+        {
+            var missingControls = new List<string>();
+            manualBindingIndex = 0;
+
+            BindControl(ref btnRefresh, missingControls);
+            BindControl(ref lblBranchCount, missingControls);
+            BindControl(ref lblSubjectCount, missingControls);
+            BindControl(ref lblClassroomCount, missingControls);
+            BindControl(ref lblScheduleCount, missingControls);
+
+            BindControl(ref txtBranchName, missingControls);
+            BindControl(ref btnBranchAdd, missingControls);
+            BindControl(ref btnBranchUpdate, missingControls);
+            BindControl(ref btnBranchDelete, missingControls);
+            BindControl(ref btnBranchClear, missingControls);
+            BindControl(ref dgvBranches, missingControls);
+
+            BindControl(ref txtStudyYearName, missingControls);
+            BindControl(ref btnStudyYearAdd, missingControls);
+            BindControl(ref btnStudyYearUpdate, missingControls);
+            BindControl(ref btnStudyYearDelete, missingControls);
+            BindControl(ref dgvStudyYears, missingControls);
+
+            BindControl(ref txtClassroomNumber, missingControls);
+            BindControl(ref numClassroomCapacity, missingControls);
+            BindControl(ref cmbRoomType, missingControls);
+            BindControl(ref btnClassroomAdd, missingControls);
+            BindControl(ref btnClassroomUpdate, missingControls);
+            BindControl(ref btnClassroomDelete, missingControls);
+            BindControl(ref dgvClassrooms, missingControls);
+
+            BindControl(ref txtFacultyName, missingControls);
+            BindControl(ref cmbAcademicTitle, missingControls);
+            BindControl(ref btnFacultyAdd, missingControls);
+            BindControl(ref btnFacultyUpdate, missingControls);
+            BindControl(ref btnFacultyDelete, missingControls);
+            BindControl(ref dgvFacultyMembers, missingControls);
+
+            BindControl(ref txtSubjectName, missingControls);
+            BindControl(ref cmbSubjectYear, missingControls);
+            BindControl(ref cmbSubjectBranch, missingControls);
+            BindControl(ref cmbSubjectFilterYear, missingControls);
+            BindControl(ref cmbSubjectFilterBranch, missingControls);
+            BindControl(ref cmbSubjectFilterSemester, missingControls);
+            BindControl(ref numSemester, missingControls);
+            BindControl(ref numTheoreticalHours, missingControls);
+            BindControl(ref numPracticalHours, missingControls);
+            BindControl(ref numCreditUnits, missingControls);
+            BindControl(ref btnSubjectAdd, missingControls);
+            BindControl(ref btnSubjectUpdate, missingControls);
+            BindControl(ref btnSubjectDelete, missingControls);
+            BindControl(ref dgvSubjects, missingControls);
+
+            BindControl(ref txtSectionName, missingControls);
+            BindControl(ref cmbSectionYear, missingControls);
+            BindControl(ref cmbSectionBranch, missingControls);
+            BindControl(ref numStudentCount, missingControls);
+            BindControl(ref btnSectionAdd, missingControls);
+            BindControl(ref btnSectionUpdate, missingControls);
+            BindControl(ref btnSectionDelete, missingControls);
+            BindControl(ref dgvSections, missingControls);
+
+            BindControl(ref txtStartTime, missingControls);
+            BindControl(ref txtEndTime, missingControls);
+            BindControl(ref chkIsBreak, missingControls);
+            BindControl(ref btnTimeSlotAdd, missingControls);
+            BindControl(ref btnTimeSlotUpdate, missingControls);
+            BindControl(ref btnTimeSlotDelete, missingControls);
+            BindControl(ref btnTimeSlotClear, missingControls);
+            BindControl(ref dgvTimeSlots, missingControls);
+
+            BindControl(ref cmbAssignFaculty, missingControls);
+            BindControl(ref cmbAssignSubject, missingControls);
+            BindControl(ref btnAssignmentAdd, missingControls);
+            BindControl(ref btnAssignmentRemove, missingControls);
+            BindControl(ref btnAssignmentClear, missingControls);
+            BindControl(ref dgvAssignments, missingControls);
+
+            BindControl(ref cmbScheduleSubject, missingControls);
+            BindControl(ref cmbScheduleFaculty, missingControls);
+            BindControl(ref cmbScheduleClassroom, missingControls);
+            BindControl(ref cmbScheduleTimeSlot, missingControls);
+            BindControl(ref cmbScheduleDay, missingControls);
+            BindControl(ref cmbScheduleYear, missingControls);
+            BindControl(ref cmbScheduleBranch, missingControls);
+            BindControl(ref cmbScheduleSection, missingControls);
+            BindControl(ref cmbScheduleFilterFaculty, missingControls);
+            BindControl(ref cmbScheduleFilterSection, missingControls);
+            BindControl(ref cmbScheduleFilterYear, missingControls);
+            BindControl(ref cmbScheduleFilterDay, missingControls);
+            BindControl(ref btnScheduleGenerate, missingControls);
+            BindControl(ref btnScheduleAdd, missingControls);
+            BindControl(ref btnScheduleUpdate, missingControls);
+            BindControl(ref btnScheduleDelete, missingControls);
+            BindControl(ref btnScheduleClear, missingControls);
+            BindControl(ref btnScheduleExport, missingControls);
+            BindControl(ref dgvSchedules, missingControls);
+
+            if (missingControls.Count == 0)
+            {
+                return true;
+            }
+
+            Text = "Timetable and Classroom Management System - Manual UI pending";
+            return false;
+        }
+
+        private void BindControl<T>(ref T field, List<string> missingControls) where T : Control
+        {
+            string controlName = RequiredManualControlNames()[manualBindingIndex++];
+            T? control = FindControlByName<T>(this, controlName);
+            if (control == null)
+            {
+                missingControls.Add(controlName);
+                return;
+            }
+
+            field = control;
+        }
+
+        private static string[] RequiredManualControlNames()
+        {
+            return new[]
+            {
+                "btnRefresh", "lblBranchCount", "lblSubjectCount", "lblClassroomCount", "lblScheduleCount",
+                "txtBranchName", "btnBranchAdd", "btnBranchUpdate", "btnBranchDelete", "btnBranchClear", "dgvBranches",
+                "txtStudyYearName", "btnStudyYearAdd", "btnStudyYearUpdate", "btnStudyYearDelete", "dgvStudyYears",
+                "txtClassroomNumber", "numClassroomCapacity", "cmbRoomType", "btnClassroomAdd", "btnClassroomUpdate", "btnClassroomDelete", "dgvClassrooms",
+                "txtFacultyName", "cmbAcademicTitle", "btnFacultyAdd", "btnFacultyUpdate", "btnFacultyDelete", "dgvFacultyMembers",
+                "txtSubjectName", "cmbSubjectYear", "cmbSubjectBranch", "cmbSubjectFilterYear", "cmbSubjectFilterBranch", "cmbSubjectFilterSemester", "numSemester", "numTheoreticalHours", "numPracticalHours", "numCreditUnits", "btnSubjectAdd", "btnSubjectUpdate", "btnSubjectDelete", "dgvSubjects",
+                "txtSectionName", "cmbSectionYear", "cmbSectionBranch", "numStudentCount", "btnSectionAdd", "btnSectionUpdate", "btnSectionDelete", "dgvSections",
+                "txtStartTime", "txtEndTime", "chkIsBreak", "btnTimeSlotAdd", "btnTimeSlotUpdate", "btnTimeSlotDelete", "btnTimeSlotClear", "dgvTimeSlots",
+                "cmbAssignFaculty", "cmbAssignSubject", "btnAssignmentAdd", "btnAssignmentRemove", "btnAssignmentClear", "dgvAssignments",
+                "cmbScheduleSubject", "cmbScheduleFaculty", "cmbScheduleClassroom", "cmbScheduleTimeSlot", "cmbScheduleDay", "cmbScheduleYear", "cmbScheduleBranch", "cmbScheduleSection", "cmbScheduleFilterFaculty", "cmbScheduleFilterSection", "cmbScheduleFilterYear", "cmbScheduleFilterDay", "btnScheduleGenerate", "btnScheduleAdd", "btnScheduleUpdate", "btnScheduleDelete", "btnScheduleClear", "btnScheduleExport", "dgvSchedules"
+            };
+        }
+
+        private static T? FindControlByName<T>(Control parent, string name) where T : Control
+        {
+            foreach (Control child in parent.Controls)
+            {
+                if (child is T typed && string.Equals(child.Name, name, StringComparison.Ordinal))
+                {
+                    return typed;
+                }
+
+                T? nested = FindControlByName<T>(child, name);
+                if (nested != null)
+                {
+                    return nested;
+                }
+            }
+
+            return null;
         }
 
         private void WireDesignerPages()
