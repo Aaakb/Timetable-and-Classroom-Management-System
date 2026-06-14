@@ -8,16 +8,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
     public partial class MainForm : Form
     {
         private static readonly Color AppBackground = Color.FromArgb(245, 247, 251);
-        private static readonly Color CardBackground = Color.White;
-        private static readonly Color SurfaceColor = Color.FromArgb(248, 250, 252);
-        private static readonly Color BorderColor = Color.FromArgb(226, 232, 240);
-        private static readonly Color HeaderColor = Color.FromArgb(15, 23, 42);
-        private static readonly Color SidebarColor = Color.FromArgb(30, 41, 59);
-        private static readonly Color SidebarHoverColor = Color.FromArgb(51, 65, 85);
-        private static readonly Color PrimaryColor = Color.FromArgb(37, 99, 235);
-        private static readonly Color SuccessColor = Color.FromArgb(16, 185, 129);
-        private static readonly Color DangerColor = Color.FromArgb(239, 68, 68);
-        private static readonly Color MutedColor = Color.FromArgb(100, 116, 139);
         private const int AutomaticScheduleSemester = 2;
 
         private readonly BranchService _branchService = new BranchService();
@@ -29,9 +19,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private readonly TimeSlotService _timeSlotService = new TimeSlotService();
         private readonly FacultyMemberSubjectService _assignmentService = new FacultyMemberSubjectService();
         private readonly ScheduleService _scheduleService = new ScheduleService();
-        private readonly CurriculumImportService _curriculumImportService = new CurriculumImportService();
-        private readonly WeeklyScheduleImportService _weeklyScheduleImportService = new WeeklyScheduleImportService();
-
         private List<Branch> _branches = new List<Branch>();
         private List<StudyYear> _studyYears = new List<StudyYear>();
         private List<Classroom> _classrooms = new List<Classroom>();
@@ -67,7 +54,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         public MainForm()
         {
             InitializeComponent();
-            BuildInterface();
+            InitializeManualBinding();
             Load += MainForm_Load;
         }
 
@@ -81,14 +68,14 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             TryLoadAllData();
         }
 
-        private void BuildInterface()
+        private void InitializeManualBinding()
         {
             BackColor = AppBackground;
 
             isUiReady = TryBindManualControls();
             if (isUiReady)
             {
-                WireDesignerPages();
+                WireManualControls();
             }
         }
 
@@ -249,7 +236,7 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             return null;
         }
 
-        private void WireDesignerPages()
+        private void WireManualControls()
         {
             btnRefresh.Click += (_, _) => TryLoadAllData();
 
@@ -731,56 +718,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
             if (result == DialogResult.Yes)
             {
                 RunCommand(action, successMessage, clearAction);
-            }
-        }
-
-        private void ImportCurriculumFromPdf()
-        {
-            DialogResult confirmation = MessageBox.Show(
-                "Import the curriculum subjects extracted from the PDF?",
-                "Import Curriculum",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
-
-            if (confirmation != DialogResult.Yes)
-            {
-                return;
-            }
-
-            try
-            {
-                CurriculumImportResult result = _curriculumImportService.ImportComputerScienceCurriculum();
-                RefreshAllData();
-                ShowInfo(BuildCurriculumImportMessage(result));
-            }
-            catch (Exception ex)
-            {
-                ShowError(ex);
-            }
-        }
-
-        private void ImportWeeklyScheduleFromPdf()
-        {
-            DialogResult confirmation = MessageBox.Show(
-                "Import the weekly schedule extracted from the 2025-2026 second semester PDF?",
-                "Import Weekly Schedule",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
-
-            if (confirmation != DialogResult.Yes)
-            {
-                return;
-            }
-
-            try
-            {
-                WeeklyScheduleImportResult result = _weeklyScheduleImportService.ImportSecondSemester2026Schedule();
-                RefreshAllData();
-                ShowInfo(BuildWeeklyScheduleImportMessage(result));
-            }
-            catch (Exception ex)
-            {
-                ShowError(ex);
             }
         }
 
@@ -1499,41 +1436,6 @@ namespace Timetable_and_Classroom_Management_System.PresentationLayer.Forms
         private static void ShowInfo(string message)
         {
             MessageBox.Show(message, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private static string BuildCurriculumImportMessage(CurriculumImportResult result)
-        {
-            return string.Join(
-                Environment.NewLine,
-                $"Study years ready: {result.StudyYearCount}",
-                $"Branches ready: {result.BranchCount}",
-                $"Subjects in PDF data: {result.TotalSubjectCount}",
-                $"Added subjects: {result.AddedSubjectCount}",
-                $"Updated subjects: {result.UpdatedSubjectCount}");
-        }
-
-        private static string BuildWeeklyScheduleImportMessage(WeeklyScheduleImportResult result)
-        {
-            var lines = new List<string>
-            {
-                $"Added schedule entries: {result.AddedScheduleCount}",
-                $"Already existing entries: {result.ExistingScheduleCount}",
-                $"Skipped conflicting entries: {result.SkippedScheduleCount}"
-            };
-
-            if (result.Warnings.Count > 0)
-            {
-                lines.Add(string.Empty);
-                lines.Add("Notes:");
-                lines.AddRange(result.Warnings.Take(8).Select(warning => "- " + warning));
-
-                if (result.Warnings.Count > 8)
-                {
-                    lines.Add($"- Plus {result.Warnings.Count - 8} more notes.");
-                }
-            }
-
-            return string.Join(Environment.NewLine, lines);
         }
 
         private static string BuildGenerationMessage(ScheduleGenerationResult result)
